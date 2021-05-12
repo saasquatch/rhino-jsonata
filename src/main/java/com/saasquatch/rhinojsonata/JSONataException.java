@@ -1,4 +1,4 @@
-package com.saasquatch.jsonata;
+package com.saasquatch.rhinojsonata;
 
 public final class JSONataException extends RuntimeException {
 

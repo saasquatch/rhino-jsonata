@@ -1,7 +1,7 @@
-package com.saasquatch.jsonata;
+package com.saasquatch.rhinojsonata;
 
-import static com.saasquatch.jsonata.JunkDrawer.readerToString;
-import static com.saasquatch.jsonata.JunkDrawer.rethrowRhinoException;
+import static com.saasquatch.rhinojsonata.JunkDrawer.readerToString;
+import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.fasterxml.jackson.databind.JsonNode;

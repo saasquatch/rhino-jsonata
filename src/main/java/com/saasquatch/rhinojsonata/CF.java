@@ -1,4 +1,4 @@
-package com.saasquatch.jsonata;
+package com.saasquatch.rhinojsonata;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;

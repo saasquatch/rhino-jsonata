@@ -1,4 +1,4 @@
-package com.saasquatch.jsonata;
+package com.saasquatch.rhinojsonata;
 
 import java.io.IOException;
 import java.io.Reader;
