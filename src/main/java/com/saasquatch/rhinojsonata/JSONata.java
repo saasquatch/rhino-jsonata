@@ -23,13 +23,13 @@ import org.mozilla.javascript.json.JsonParser;
 
 public final class JSONata {
 
-  final Context cx;
-  final Scriptable scope;
-  final NativeObject jsonataObject;
-  final ObjectMapper objectMapper;
+  private final Context cx;
+  private final Scriptable scope;
+  private final NativeObject jsonataObject;
+  private final ObjectMapper objectMapper;
 
-  private JSONata(Context cx, Scriptable scope, NativeObject jsonataObject,
-      ObjectMapper objectMapper) {
+  private JSONata(@Nonnull Context cx, @Nonnull Scriptable scope,
+      @Nonnull NativeObject jsonataObject, @Nonnull ObjectMapper objectMapper) {
     this.cx = cx;
     this.scope = scope;
     this.jsonataObject = jsonataObject;
