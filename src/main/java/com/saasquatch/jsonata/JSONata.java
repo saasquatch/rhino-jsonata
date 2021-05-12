@@ -6,6 +6,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,6 +19,7 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.Undefined;
 import org.mozilla.javascript.json.JsonParser;
 
 public final class JSONata {
@@ -33,9 +35,10 @@ public final class JSONata {
     this.jsonataObject = jsonataObject;
   }
 
-  public Object evaluate(JsonNode input) {
+  public JsonNode evaluate(JsonNode input) {
+    final Object evaluateResult;
     try {
-      return ScriptableObject.callMethod(jsonataObject, "evaluate",
+      evaluateResult = ScriptableObject.callMethod(jsonataObject, "evaluate",
           new Object[]{
               input == null ? null : new JsonParser(cx, scope).parseValue(input.toString())});
     } catch (RhinoException e) {
@@ -43,6 +46,10 @@ public final class JSONata {
     } catch (JsonParser.ParseException e) {
       throw new JSONataException(e.getMessage(), e);
     }
+    if (evaluateResult instanceof Undefined) {
+      return JsonNodeFactory.instance.missingNode();
+    }
+    return mapper.valueToTree(evaluateResult);
   }
 
   public void assignJsExpression(String name, String jsExpression) {
