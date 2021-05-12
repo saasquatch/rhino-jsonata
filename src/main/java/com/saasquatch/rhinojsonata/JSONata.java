@@ -42,11 +42,10 @@ public final class JSONata {
     final Object evaluateResult;
     try {
       evaluateResult = ScriptableObject.callMethod(jsonataObject, "evaluate",
-          new Object[]{
-              input == null ? null : new JsonParser(cx, scope).parseValue(input.toString())});
+          new Object[]{new JsonParser(cx, scope).parseValue(mapper.writeValueAsString(input))});
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
-    } catch (JsonParser.ParseException e) {
+    } catch (JsonParser.ParseException | IOException e) {
       throw new JSONataException(e.getMessage(), e);
     }
     if (evaluateResult instanceof Undefined) {
@@ -82,7 +81,8 @@ public final class JSONata {
     }
   }
 
-  public void registerJsFunction(@Nonnull String name, @Nonnull String jsFunctionExpression, @Nullable String signature) {
+  public void registerJsFunction(@Nonnull String name, @Nonnull String jsFunctionExpression,
+      @Nullable String signature) {
     try {
       ScriptableObject.callMethod(jsonataObject, "registerFunction",
           new Object[]{name, cx.evaluateString(scope, jsFunctionExpression, null, 1, null),
@@ -92,7 +92,8 @@ public final class JSONata {
     }
   }
 
-  public void registerJavaMemberFunction(@Nonnull String name, @Nonnull Member methodOrConstructor, @Nullable String signature) {
+  public void registerJavaMemberFunction(@Nonnull String name, @Nonnull Member methodOrConstructor,
+      @Nullable String signature) {
     try {
       ScriptableObject.callMethod(jsonataObject, "assign",
           new Object[]{name, new FunctionObject(name, methodOrConstructor, scope), signature});
