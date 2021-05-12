@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UncheckedIOException;
 import java.lang.reflect.Member;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -27,22 +26,25 @@ import org.mozilla.javascript.json.JsonParser;
 
 public final class JSONata {
 
-  private final ObjectMapper mapper = new ObjectMapper();
   final Context cx;
   final Scriptable scope;
   final NativeObject jsonataObject;
+  final ObjectMapper objectMapper;
 
-  private JSONata(Context cx, Scriptable scope, NativeObject jsonataObject) {
+  private JSONata(Context cx, Scriptable scope, NativeObject jsonataObject,
+      ObjectMapper objectMapper) {
     this.cx = cx;
     this.scope = scope;
     this.jsonataObject = jsonataObject;
+    this.objectMapper = objectMapper;
   }
 
   public JsonNode evaluate(@Nullable JsonNode input) {
     final Object evaluateResult;
     try {
       evaluateResult = ScriptableObject.callMethod(jsonataObject, "evaluate",
-          new Object[]{new JsonParser(cx, scope).parseValue(mapper.writeValueAsString(input))});
+          new Object[]{
+              new JsonParser(cx, scope).parseValue(objectMapper.writeValueAsString(input))});
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
     } catch (JsonParser.ParseException | IOException e) {
@@ -51,7 +53,7 @@ public final class JSONata {
     if (evaluateResult instanceof Undefined) {
       return JsonNodeFactory.instance.missingNode();
     }
-    return mapper.valueToTree(evaluateResult);
+    return objectMapper.valueToTree(evaluateResult);
   }
 
   public void assignJsExpression(@Nonnull String name, @Nonnull String jsExpression) {
@@ -103,16 +105,24 @@ public final class JSONata {
   }
 
   public static JSONata parse(@Nonnull String expression) {
+    return parse(expression, JSONataOptions.newBuilder().build());
+  }
+
+  public static JSONata parse(@Nonnull String expression, @Nonnull JSONataOptions options) {
     Objects.requireNonNull(expression);
     final String jsonataJsString;
-    try (
-        InputStream jsonataSourceStream = JSONata.class.getResourceAsStream(
-            "/saasquatch-jsonata-es5.min.js");
-        Reader jsonataSourceReader = new InputStreamReader(jsonataSourceStream, UTF_8);
-    ) {
-      jsonataJsString = readerToString(jsonataSourceReader);
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
+    if (options.jsonataJsSource == null) {
+      try (
+          InputStream jsonataSourceStream = JSONata.class.getResourceAsStream(
+              "/saasquatch-jsonata-es5.min.js");
+          Reader jsonataSourceReader = new InputStreamReader(jsonataSourceStream, UTF_8);
+      ) {
+        jsonataJsString = readerToString(jsonataSourceReader);
+      } catch (IOException e) {
+        throw new JSONataException(e.getMessage(), e);
+      }
+    } else {
+      jsonataJsString = options.jsonataJsSource;
     }
     final Context cx = Context.enter();
     final Scriptable scope = cx.initSafeStandardObjects();
@@ -120,9 +130,58 @@ public final class JSONata {
       cx.evaluateString(scope, jsonataJsString, null, 1, null);
       final NativeObject jsonataObject = (NativeObject) ScriptableObject.callMethod(
           scope, "jsonata", new Object[]{expression});
-      return new JSONata(cx, scope, jsonataObject);
+      applyOptions(cx, scope, jsonataObject, options);
+      return new JSONata(cx, scope, jsonataObject,
+          options.objectMapper == null ? new ObjectMapper() : options.objectMapper);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
+    }
+  }
+
+  private static void applyOptions(Context cx, Scriptable scope, NativeObject jsonataObject,
+      JSONataOptions options) {
+    if (options.timeout != null) {
+      /*
+       * The code comes from https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158
+       * It is licenced under MIT License
+       */
+      cx.evaluateString(scope, ""
+          + "function timeboxExpression(expr, timeout, maxDepth) {\n"
+          + "    var depth = 0;\n"
+          + "    var time = Date.now();\n"
+          + "\n"
+          + "    var checkRunnaway = function() {\n"
+          + "        if (depth > maxDepth) {\n"
+          + "            // stack too deep\n"
+          + "            throw {\n"
+          + "                message:\n"
+          + "                    \"Stack overflow error: Check for non-terminating recursive function.  Consider rewriting as tail-recursive.\",\n"
+          + "                stack: new Error().stack,\n"
+          + "                code: \"U1001\"\n"
+          + "            };\n"
+          + "        }\n"
+          + "        if (Date.now() - time > timeout) {\n"
+          + "            // expression has run for too long\n"
+          + "            throw {\n"
+          + "                message: \"Expression evaluation timeout: Check for infinite loop\",\n"
+          + "                stack: new Error().stack,\n"
+          + "                code: \"U1001\"\n"
+          + "            };\n"
+          + "        }\n"
+          + "    };\n"
+          + "\n"
+          + "    // register callbacks\n"
+          + "    expr.assign(\"__evaluate_entry\", function() {\n"
+          + "        depth++;\n"
+          + "        checkRunnaway();\n"
+          + "    });\n"
+          + "    expr.assign(\"__evaluate_exit\", function() {\n"
+          + "        depth--;\n"
+          + "        checkRunnaway();\n"
+          + "    });\n"
+          + "}", null, 1, null);
+      ScriptableObject.callMethod(scope, "timeboxExpression",
+          new Object[]{jsonataObject, options.timeout, options.maxDepth});
     }
   }
 
