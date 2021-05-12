@@ -107,12 +107,8 @@ public final class JSONata {
 
   public static JSONata parse(@Nonnull String expression, @Nonnull JSONataOptions options) {
     Objects.requireNonNull(expression);
-    final String jsonataJsString;
-    if (options.jsonataJsSource == null) {
-      jsonataJsString = getDefaultJSONataSource();
-    } else {
-      jsonataJsString = options.jsonataJsSource;
-    }
+    final String jsonataJsString =
+        options.jsonataJsSource == null ? getDefaultJSONataSource() : options.jsonataJsSource;
     final Context cx = Context.enter();
     final Scriptable scope = cx.initSafeStandardObjects();
     try {
