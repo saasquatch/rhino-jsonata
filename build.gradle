@@ -12,8 +12,9 @@ repositories {
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.1'
-    implementation 'org.mozilla:rhino:1.7.13'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
+    api 'org.mozilla:rhino:1.7.13'
+    api 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
+    api 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
 test {
