@@ -1,11 +1,8 @@
 package com.saasquatch.jsonata;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
-import java.io.StringReader;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.NativeJSON;
 import org.mozilla.javascript.RhinoException;
@@ -20,10 +17,9 @@ final class JunkDrawer {
       final Object embeddedJsValue = ((JavaScriptException) e).getValue();
       throw new JSONataException(
           NativeJSON.stringify(cx, scope, embeddedJsValue, null, null).toString(), e);
-    } else if (e instanceof EvaluatorException) {
+    } else {
       throw new JSONataException(e.getMessage(), e);
     }
-    throw e;
   }
 
   public static String readerToString(Reader reader) throws IOException {
