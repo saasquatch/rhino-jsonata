@@ -2,6 +2,7 @@ package com.saasquatch.jsonata;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.concurrent.ThreadLocalRandom;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.NativeJSON;
@@ -30,6 +31,10 @@ final class JunkDrawer {
       sb.append(buf, 0, numCharsRead);
     }
     return sb.toString();
+  }
+
+  public static String randomVarName() {
+    return "rand_var_" + ThreadLocalRandom.current().nextLong();
   }
 
 }

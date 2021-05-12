@@ -36,7 +36,7 @@ public final class JSONata {
     }
   }
 
-  public void assignJavaScriptExpression(String name, String jsExpression) {
+  public void assignJsExpression(String name, String jsExpression) {
     try {
       ScriptableObject.callMethod(jsonataObject, "assign",
           new Object[]{name, cx.evaluateString(scope, jsExpression, "", 1, null)});
