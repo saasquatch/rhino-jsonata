@@ -4,6 +4,8 @@ import static com.saasquatch.jsonata.JunkDrawer.readerToString;
 import static com.saasquatch.jsonata.JunkDrawer.rethrowRhinoException;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,9 +18,11 @@ import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.json.JsonParser;
 
 public final class JSONata {
 
+  private final ObjectMapper mapper = new ObjectMapper();
   private final Context cx;
   private final Scriptable scope;
   private final NativeObject jsonataObject;
@@ -29,12 +33,15 @@ public final class JSONata {
     this.jsonataObject = jsonataObject;
   }
 
-  public Object evaluate(Object input) {
+  public Object evaluate(JsonNode input) {
     try {
       return ScriptableObject.callMethod(jsonataObject, "evaluate",
-          new Object[]{Context.javaToJS(input, scope)});
+          new Object[]{
+              input == null ? null : new JsonParser(cx, scope).parseValue(input.toString())});
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
+    } catch (JsonParser.ParseException e) {
+      throw new JSONataException(e.getMessage(), e);
     }
   }
 
@@ -128,6 +135,7 @@ public final class JSONata {
 //        scope, "jsonata(" + new JsonPrimitive(expression) + ");", "jsonataObject", 0, null);
       final NativeObject jsonataObject = (NativeObject) ScriptableObject.callMethod(
           scope, "jsonata", new Object[]{expression});
+      ScriptableObject.putProperty(scope, "expression", jsonataObject);
       return new JSONata(cx, scope, jsonataObject);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
