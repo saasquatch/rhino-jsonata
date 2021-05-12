@@ -54,6 +54,7 @@ final class JunkDrawer {
       + "    });\n"
       + "}";
 
+  // Lazy init
   private static String defaultJSONataSource;
 
   private JunkDrawer() {
