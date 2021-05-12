@@ -55,7 +55,7 @@ public final class JSONata {
   public void assignJsExpression(String name, String jsExpression) {
     try {
       ScriptableObject.callMethod(jsonataObject, "assign",
-          new Object[]{name, cx.evaluateString(scope, jsExpression, "", 1, null)});
+          new Object[]{name, cx.evaluateString(scope, jsExpression, null, 1, null)});
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
     }
@@ -74,6 +74,26 @@ public final class JSONata {
     try {
       ScriptableObject.callMethod(jsonataObject, "assign",
           new Object[]{name, new FunctionObject(name, methodOrConstructor, scope)});
+    } catch (RhinoException e) {
+      rethrowRhinoException(cx, scope, e);
+    }
+  }
+
+  public void registerJsFunction(String name, String jsFunctionExpression, String signature) {
+    try {
+      ScriptableObject.callMethod(jsonataObject, "registerFunction",
+          new Object[]{name, cx.evaluateString(scope, jsFunctionExpression, null, 1, null),
+              signature});
+    } catch (RhinoException e) {
+      rethrowRhinoException(cx, scope, e);
+    }
+  }
+
+  public void registerJavaMemberFunction(String name, Member methodOrConstructor,
+      String signature) {
+    try {
+      ScriptableObject.callMethod(jsonataObject, "assign",
+          new Object[]{name, new FunctionObject(name, methodOrConstructor, scope), signature});
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
     }
