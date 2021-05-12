@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Map;
+import java.util.Optional;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.NativeJSON;
@@ -62,8 +64,19 @@ final class JunkDrawer {
   public static <T> T rethrowRhinoException(Context cx, Scriptable scope, RhinoException e) {
     if (e instanceof JavaScriptException) {
       final Object embeddedJsValue = ((JavaScriptException) e).getValue();
-      throw new JSONataException(
-          NativeJSON.stringify(cx, scope, embeddedJsValue, null, null).toString(), e);
+      String message = null;
+      if (embeddedJsValue instanceof CharSequence) {
+        message = embeddedJsValue.toString();
+      } else if (embeddedJsValue instanceof Map) {
+        message = Optional.ofNullable(((Map<?, ?>) embeddedJsValue).get("message"))
+            .filter(CharSequence.class::isInstance)
+            .map(Object::toString)
+            .orElse(null);
+      }
+      if (message == null) {
+        message = NativeJSON.stringify(cx, scope, embeddedJsValue, null, null).toString();
+      }
+      throw new JSONataException(message, e);
     } else {
       throw new JSONataException(e.getMessage(), e);
     }
