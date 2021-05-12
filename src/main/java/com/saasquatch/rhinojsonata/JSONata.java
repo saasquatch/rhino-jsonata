@@ -162,7 +162,6 @@ public final class JSONata {
 //        scope, "jsonata(" + new JsonPrimitive(expression) + ");", "jsonataObject", 0, null);
       final NativeObject jsonataObject = (NativeObject) ScriptableObject.callMethod(
           scope, "jsonata", new Object[]{expression});
-      ScriptableObject.putProperty(scope, "expression", jsonataObject);
       return new JSONata(cx, scope, jsonataObject);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
