@@ -129,7 +129,7 @@ public final class JSONataExpression {
     if (options.timeout != null) {
       cx.evaluateString(scope, TIMEBOX_EXPRESSION_JS, null, 1, null);
       ScriptableObject.callMethod(scope, "timeboxExpression",
-          new Object[]{jsonataObject, options.timeout, options.maxDepth});
+          new Object[]{jsonataObject, options.timeout.toMillis(), options.maxDepth});
     }
   }
 
