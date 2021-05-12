@@ -36,7 +36,7 @@ public final class JSONataOptions {
     private Builder() {
     }
 
-    private Builder timeboxExpression(@Nonnull Duration timeout, @Nonnegative int maxDepth) {
+    public Builder timeboxExpression(@Nonnull Duration timeout, @Nonnegative int maxDepth) {
       if (timeout.isNegative()) {
         throw new IllegalArgumentException("timeout cannot be negative");
       }
