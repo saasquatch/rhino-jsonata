@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.util.Objects;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public final class JSONataOptions {
 
@@ -13,8 +14,8 @@ public final class JSONataOptions {
   final ObjectMapper objectMapper;
   final String jsonataJsSource;
 
-  private JSONataOptions(Duration timeout, int maxDepth,
-      ObjectMapper objectMapper, String jsonataJsSource) {
+  private JSONataOptions(@Nullable Duration timeout, int maxDepth,
+      @Nullable ObjectMapper objectMapper, @Nullable String jsonataJsSource) {
     this.timeout = timeout;
     this.maxDepth = maxDepth;
     this.objectMapper = objectMapper;
@@ -32,7 +33,8 @@ public final class JSONataOptions {
     private ObjectMapper objectMapper;
     private String jsonataJsSource;
 
-    private Builder() {}
+    private Builder() {
+    }
 
     private Builder timeboxExpression(@Nonnull Duration timeout, @Nonnegative int maxDepth) {
       if (timeout.isNegative()) {
