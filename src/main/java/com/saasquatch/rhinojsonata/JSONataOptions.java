@@ -52,7 +52,7 @@ public final class JSONataOptions {
       return this;
     }
 
-    public Builder setJsonataJsSource(@Nonnull String jsonataJsSource) {
+    public Builder setJSONataJsSource(@Nonnull String jsonataJsSource) {
       this.jsonataJsSource = Objects.requireNonNull(jsonataJsSource);
       return this;
     }
