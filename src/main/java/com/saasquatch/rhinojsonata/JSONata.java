@@ -1,17 +1,13 @@
 package com.saasquatch.rhinojsonata;
 
 import static com.saasquatch.rhinojsonata.JunkDrawer.TIMEBOX_EXPRESSION_JS;
-import static com.saasquatch.rhinojsonata.JunkDrawer.readerToString;
+import static com.saasquatch.rhinojsonata.JunkDrawer.getDefaultJSONataSource;
 import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.lang.reflect.Member;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -113,15 +109,7 @@ public final class JSONata {
     Objects.requireNonNull(expression);
     final String jsonataJsString;
     if (options.jsonataJsSource == null) {
-      try (
-          InputStream jsonataSourceStream = JSONata.class.getResourceAsStream(
-              "/saasquatch-jsonata-es5.min.js");
-          Reader jsonataSourceReader = new InputStreamReader(jsonataSourceStream, UTF_8);
-      ) {
-        jsonataJsString = readerToString(jsonataSourceReader);
-      } catch (IOException e) {
-        throw new JSONataException(e.getMessage(), e);
-      }
+      jsonataJsString = getDefaultJSONataSource();
     } else {
       jsonataJsString = options.jsonataJsSource;
     }

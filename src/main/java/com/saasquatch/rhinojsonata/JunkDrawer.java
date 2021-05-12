@@ -1,8 +1,11 @@
 package com.saasquatch.rhinojsonata;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.concurrent.ThreadLocalRandom;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.NativeJSON;
@@ -51,7 +54,10 @@ final class JunkDrawer {
       + "    });\n"
       + "}";
 
-  private JunkDrawer() {}
+  private static String defaultJSONataSource;
+
+  private JunkDrawer() {
+  }
 
   public static <T> T rethrowRhinoException(Context cx, Scriptable scope, RhinoException e) {
     if (e instanceof JavaScriptException) {
@@ -73,8 +79,24 @@ final class JunkDrawer {
     return sb.toString();
   }
 
-  public static String randomVarName() {
-    return "rand_var_" + ThreadLocalRandom.current().nextLong();
+  public static String getDefaultJSONataSource() {
+    String s = defaultJSONataSource;
+    if (s == null) {
+      defaultJSONataSource = s = loadDefaultJSONataJsSource();
+    }
+    return s;
+  }
+
+  private static String loadDefaultJSONataJsSource() {
+    try (
+        InputStream jsonataSourceStream = JSONata.class.getResourceAsStream(
+            "/saasquatch-jsonata-es5.min.js");
+        Reader jsonataSourceReader = new InputStreamReader(jsonataSourceStream, UTF_8);
+    ) {
+      return readerToString(jsonataSourceReader);
+    } catch (IOException e) {
+      throw new JSONataException(e.getMessage(), e);
+    }
   }
 
 }
