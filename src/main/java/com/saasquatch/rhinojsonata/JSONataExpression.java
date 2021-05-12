@@ -127,10 +127,6 @@ public final class JSONataExpression {
   private static void applyOptions(Context cx, Scriptable scope, NativeObject jsonataObject,
       JSONataExpressionOptions options) {
     if (options.timeout != null) {
-      /*
-       * The code comes from https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158
-       * It is licenced under MIT License
-       */
       cx.evaluateString(scope, TIMEBOX_EXPRESSION_JS, null, 1, null);
       ScriptableObject.callMethod(scope, "timeboxExpression",
           new Object[]{jsonataObject, options.timeout, options.maxDepth});
