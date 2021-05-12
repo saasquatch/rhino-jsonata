@@ -39,7 +39,21 @@ public final class JSONata {
   }
 
   public void timeboxExpression(int timeout, int maxDepth) {
-    final String js = ""
+    ScriptableObject.callMethod(scope, "timeboxExpression",
+        new Object[]{jsonataObject, timeout, maxDepth});
+  }
+
+  public static JSONata parse(String expression) {
+    final String jsonataJsString;
+    try {
+      jsonataJsString = IOUtils.toString(Objects.requireNonNull(
+          JSONata.class.getResourceAsStream("/saasquatch-jsonata-es5.min.js")), UTF_8);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+    final Context cx = Context.enter();
+    final Scriptable scope = cx.initSafeStandardObjects();
+    cx.evaluateString(scope, ""
         + "function timeboxExpression(expr, timeout, maxDepth) {\n"
         + "    var depth = 0;\n"
         + "    var time = Date.now();\n"
@@ -73,23 +87,8 @@ public final class JSONata {
         + "        depth--;\n"
         + "        checkRunnaway();\n"
         + "    });\n"
-        + "}";
-    cx.evaluateString(scope, js, null, 1, null);
-    ScriptableObject.callMethod(scope, "timeboxExpression",
-        new Object[]{jsonataObject, timeout, maxDepth});
-  }
-
-  public static JSONata parse(String expression) {
-    final String jsonataJsString;
-    try {
-      jsonataJsString = IOUtils.toString(Objects.requireNonNull(
-          JSONata.class.getResourceAsStream("/saasquatch-jsonata-es5.min.js")), UTF_8);
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
-    final Context cx = Context.enter();
-    final Scriptable scope = cx.initSafeStandardObjects();
-    cx.evaluateString(scope, jsonataJsString, "jsonata", 0, null);
+        + "}", null, 1, null);
+    cx.evaluateString(scope, jsonataJsString, null, 1, null);
 //    final NativeObject jsonataObject = (NativeObject) cx.evaluateString(
 //        scope, "jsonata(" + new JsonPrimitive(expression) + ");", "jsonataObject", 0, null);
     final NativeObject jsonataObject = (NativeObject) ScriptableObject.callMethod(
