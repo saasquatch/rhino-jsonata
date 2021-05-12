@@ -71,10 +71,10 @@ public final class JSONata {
     }
   }
 
-  public void assignJavaMember(@Nonnull String name, @Nonnull Member methodOrConstructor) {
+  public void assignJavaMember(@Nonnull String name, @Nonnull Member javaMember) {
     try {
       ScriptableObject.callMethod(jsonataObject, "assign",
-          new Object[]{name, new FunctionObject(name, methodOrConstructor, scope)});
+          new Object[]{name, new FunctionObject(name, javaMember, scope)});
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
     }
@@ -91,11 +91,11 @@ public final class JSONata {
     }
   }
 
-  public void registerJavaMemberFunction(@Nonnull String name, @Nonnull Member methodOrConstructor,
+  public void registerJavaMemberFunction(@Nonnull String name, @Nonnull Member javaMember,
       @Nullable String signature) {
     try {
       ScriptableObject.callMethod(jsonataObject, "assign",
-          new Object[]{name, new FunctionObject(name, methodOrConstructor, scope), signature});
+          new Object[]{name, new FunctionObject(name, javaMember, scope), signature});
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
     }
