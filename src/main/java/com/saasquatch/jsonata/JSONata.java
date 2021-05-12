@@ -1,10 +1,15 @@
 package com.saasquatch.jsonata;
 
+import static com.saasquatch.jsonata.JunkDrawer.readerToString;
 import static com.saasquatch.jsonata.JunkDrawer.rethrowRhinoException;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import org.apache.commons.io.IOUtils;
 import org.mozilla.javascript.Context;
@@ -63,9 +68,12 @@ public final class JSONata {
 
   public static JSONata parse(String expression) {
     final String jsonataJsString;
-    try {
-      jsonataJsString = IOUtils.toString(Objects.requireNonNull(
-          JSONata.class.getResourceAsStream("/saasquatch-jsonata-es5.min.js")), UTF_8);
+    try (
+        InputStream jsonataSourceStream = JSONata.class.getResourceAsStream(
+            "/saasquatch-jsonata-es5.min.js");
+        Reader jsonataSourceReader = new InputStreamReader(jsonataSourceStream, UTF_8);
+    ) {
+      jsonataJsString = readerToString(jsonataSourceReader);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
