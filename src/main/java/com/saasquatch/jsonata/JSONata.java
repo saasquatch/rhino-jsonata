@@ -9,7 +9,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
+import java.lang.reflect.Member;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.FunctionObject;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
@@ -49,6 +51,15 @@ public final class JSONata {
     try {
       ScriptableObject.callMethod(jsonataObject, "assign",
           new Object[]{name, Context.javaToJS(javaObject, scope)});
+    } catch (RhinoException e) {
+      rethrowRhinoException(cx, scope, e);
+    }
+  }
+
+  public void assignJavaMember(String name, Member methodOrConstructor) {
+    try {
+      ScriptableObject.callMethod(jsonataObject, "assign",
+          new Object[]{name, new FunctionObject(name, methodOrConstructor, scope)});
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
     }
