@@ -1,0 +1,22 @@
+plugins {
+    id 'java-library'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.1'
+    implementation 'org.mozilla:rhino:1.7.13'
+    implementation 'commons-io:commons-io:2.8.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
+}
+
+test {
+    useJUnitPlatform()
+}
