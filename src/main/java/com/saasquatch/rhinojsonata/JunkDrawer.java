@@ -64,7 +64,7 @@ final class JunkDrawer {
   }
 
   public static String readerToString(Reader reader) throws IOException {
-    final char[] buf = new char[8 * 1024];
+    final char[] buf = new char[8192];
     final StringBuilder sb = new StringBuilder();
     int numCharsRead;
     while ((numCharsRead = reader.read(buf, 0, buf.length)) != -1) {
