@@ -94,7 +94,7 @@ final class JunkDrawer {
 
   private static String loadDefaultJSONataJsSource() {
     try (
-        InputStream jsonataSourceStream = JSONata.class.getResourceAsStream(
+        InputStream jsonataSourceStream = JSONataExpression.class.getResourceAsStream(
             "/saasquatch-jsonata-es5.min.js");
         Reader jsonataSourceReader = new InputStreamReader(jsonataSourceStream, UTF_8);
     ) {

@@ -2,9 +2,11 @@ package com.saasquatch.rhinojsonata;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import java.time.Duration;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -42,7 +44,7 @@ public class T {
 
   @Test
   public void t2() throws Exception {
-    JSONata jsonata = JSONata.parse("{\"bar\":$foo('a')}");
+    JSONataExpression jsonata = JSONataExpression.parse("{\"bar\":$foo('a')}");
 //    jsonata.assignJavaMember("foo", T.class.getDeclaredMethod("f1", String.class));
 //    jsonata.assignJsExpression("foo", "a => a + a");
     jsonata.assignJsExpression("foo", "function(a) {return a + a;};");
@@ -59,16 +61,16 @@ public class T {
 
   @Test
   public void t3() throws Exception {
-//    JSONata jsonata = JSONata.parse("foo");
-////    jsonata.assignJavaMember("foo", T.class.getDeclaredMethod("f1", String.class));
-////    jsonata.assignJsExpression("foo", "a => a + a");
-////    jsonata.assignJsExpression("foo", "function(a) {return a + a;};");
-////    jsonata.evaluate(JsonNodeFactory.instance.objectNode().put("foo", 123));
-//    System.out.println("ccccccccccccccccccc");
-//    Object evalResult = jsonata.evaluate(JsonNodeFactory.instance.objectNode().put("foo", 123));
-//    System.out.println(evalResult);
-//    System.out.println(evalResult.getClass());
-//    System.out.println(new ObjectMapper().writeValueAsString(evalResult));
+    JSONataExpression jsonata = JSONataExpression.parse("foo");
+//    jsonata.assignJavaMember("foo", T.class.getDeclaredMethod("f1", String.class));
+//    jsonata.assignJsExpression("foo", "a => a + a");
+//    jsonata.assignJsExpression("foo", "function(a) {return a + a;};");
+//    jsonata.evaluate(JsonNodeFactory.instance.objectNode().put("foo", 123));
+    System.out.println("ccccccccccccccccccc");
+    Object evalResult = jsonata.evaluate(JsonNodeFactory.instance.objectNode().put("foo", 123));
+    System.out.println(evalResult);
+    System.out.println(evalResult.getClass());
+    System.out.println(new ObjectMapper().writeValueAsString(evalResult));
   }
 
   @Test
@@ -80,6 +82,27 @@ public class T {
     System.out.println(r.getClass());
     System.out.println(r);
     System.out.println(new ObjectMapper().writeValueAsString(r));
+  }
+
+  @Test
+  public void t5() throws Exception {
+    final Context cx = Context.enter();
+    final Scriptable scope = cx.initSafeStandardObjects();
+    try {
+      cx.evaluateString(scope, "throw '123'", null, 1, null);
+    } catch (JavaScriptException e) {
+      Object value = e.getValue();
+      System.out.println(value.getClass());
+      JunkDrawer.rethrowRhinoException(cx, scope, e);
+    }
+  }
+
+  @Test
+  public void t6() throws Exception {
+    JSONataExpression expression = JSONataExpression.parse("",
+        JSONataExpressionOptions.newBuilder()
+            .timeboxExpression(Duration.ofSeconds(1), 1000)
+            .build());
   }
 
 }

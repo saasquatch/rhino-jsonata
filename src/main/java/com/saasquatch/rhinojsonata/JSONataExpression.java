@@ -21,14 +21,14 @@ import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 import org.mozilla.javascript.json.JsonParser;
 
-public final class JSONata {
+public final class JSONataExpression {
 
   private final Context cx;
   private final Scriptable scope;
   private final NativeObject jsonataObject;
   private final ObjectMapper objectMapper;
 
-  private JSONata(@Nonnull Context cx, @Nonnull Scriptable scope,
+  private JSONataExpression(@Nonnull Context cx, @Nonnull Scriptable scope,
       @Nonnull NativeObject jsonataObject, @Nonnull ObjectMapper objectMapper) {
     this.cx = cx;
     this.scope = scope;
@@ -101,11 +101,12 @@ public final class JSONata {
     }
   }
 
-  public static JSONata parse(@Nonnull String expression) {
-    return parse(expression, JSONataOptions.newBuilder().build());
+  public static JSONataExpression parse(@Nonnull String expression) {
+    return parse(expression, JSONataExpressionOptions.newBuilder().build());
   }
 
-  public static JSONata parse(@Nonnull String expression, @Nonnull JSONataOptions options) {
+  public static JSONataExpression parse(@Nonnull String expression,
+      @Nonnull JSONataExpressionOptions options) {
     Objects.requireNonNull(expression);
     final String jsonataJsString =
         options.jsonataJsSource == null ? getDefaultJSONataSource() : options.jsonataJsSource;
@@ -116,7 +117,7 @@ public final class JSONata {
       final NativeObject jsonataObject = (NativeObject) ScriptableObject.callMethod(
           scope, "jsonata", new Object[]{expression});
       applyOptions(cx, scope, jsonataObject, options);
-      return new JSONata(cx, scope, jsonataObject,
+      return new JSONataExpression(cx, scope, jsonataObject,
           options.objectMapper == null ? new ObjectMapper() : options.objectMapper);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
@@ -124,7 +125,7 @@ public final class JSONata {
   }
 
   private static void applyOptions(Context cx, Scriptable scope, NativeObject jsonataObject,
-      JSONataOptions options) {
+      JSONataExpressionOptions options) {
     if (options.timeout != null) {
       /*
        * The code comes from https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158
