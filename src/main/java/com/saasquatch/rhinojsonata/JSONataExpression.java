@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -24,7 +25,6 @@ import org.mozilla.javascript.json.JsonParser;
 
 public final class JSONataExpression {
 
-  private final AtomicBoolean timeboxed = new AtomicBoolean();
   private final Context cx;
   private final Scriptable scope;
   private final ObjectMapper objectMapper;
@@ -113,19 +113,9 @@ public final class JSONataExpression {
   }
 
   public void timeboxExpression(@Nonnull Duration timeout, @Nonnegative int maxDepth) {
-    if (timeout.isNegative()) {
-      throw new IllegalArgumentException("timeout cannot be negative");
-    }
-    //noinspection ConstantConditions
-    if (maxDepth < 0) {
-      throw new IllegalArgumentException("maxDepth cannot be negative");
-    }
-    if (timeboxed.getAndSet(true)) {
-      throw new IllegalStateException(
-          "This " + this.getClass().getSimpleName() + " is already timeboxed");
-    }
+    Objects.requireNonNull(timeout);
     jsonata.getTimeboxExpressionFunction().call(cx, scope, scope,
-        new Object[]{expressionNativeObject, timeout.toMillis(), maxDepth});
+        new Object[]{expressionNativeObject, (int) timeout.toMillis(), maxDepth});
   }
 
 }

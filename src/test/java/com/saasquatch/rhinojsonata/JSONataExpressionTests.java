@@ -177,13 +177,7 @@ public class JSONataExpressionTests {
   public void testTimeboxValidation() {
     final JSONataExpression expression = jsonata.parse("1");
     assertThrows(NullPointerException.class, () -> expression.timeboxExpression(null, 1000));
-    assertThrows(IllegalArgumentException.class, () -> expression.timeboxExpression(
-        Duration.ofSeconds(-1), 1000));
-    assertThrows(IllegalArgumentException.class, () -> expression.timeboxExpression(
-        Duration.ofSeconds(1), -1000));
     assertDoesNotThrow(() -> expression.timeboxExpression(Duration.ofSeconds(1), 1000));
-    assertThrows(IllegalStateException.class,
-        () -> expression.timeboxExpression(Duration.ofSeconds(1), 1000));
   }
 
   @Test
