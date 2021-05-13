@@ -7,10 +7,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -54,6 +56,16 @@ public class JunkDrawerTests {
         rethrowRhinoException(cx, scope, e);
       } catch (JSONataException e2) {
         assertEquals("1", e2.getMessage());
+      }
+    }
+    try {
+      cx.evaluateString(scope, "(", null, 1, null);
+      fail();
+    } catch (RhinoException e) {
+      try {
+        rethrowRhinoException(cx, scope, e);
+      } catch (JSONataException e2) {
+        assertTrue(e2.getMessage().toLowerCase(Locale.ROOT).contains("unexpected"));
       }
     }
   }
