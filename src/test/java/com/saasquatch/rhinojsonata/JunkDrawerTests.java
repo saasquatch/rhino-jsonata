@@ -7,6 +7,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
@@ -27,6 +28,7 @@ public class JunkDrawerTests {
     final Scriptable scope = cx.initSafeStandardObjects();
     try {
       cx.evaluateString(scope, "throw {foo:true}", null, 1, null);
+      fail();
     } catch (RhinoException e) {
       try {
         rethrowRhinoException(cx, scope, e);
@@ -36,6 +38,7 @@ public class JunkDrawerTests {
     }
     try {
       cx.evaluateString(scope, "throw 'foo'", null, 1, null);
+      fail();
     } catch (RhinoException e) {
       try {
         rethrowRhinoException(cx, scope, e);
@@ -45,6 +48,7 @@ public class JunkDrawerTests {
     }
     try {
       cx.evaluateString(scope, "throw 1", null, 1, null);
+      fail();
     } catch (RhinoException e) {
       try {
         rethrowRhinoException(cx, scope, e);
