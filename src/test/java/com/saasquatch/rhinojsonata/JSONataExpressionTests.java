@@ -113,11 +113,6 @@ public class JSONataExpressionTests {
 
   @Test
   public void testRegisterJsFunction() {
-//    {
-//      final JSONataExpression expression = jsonata.parse("$foo(1)");
-//      expression.registerJsFunction("foo", "a => a + a", "<n:n>");
-//      assertEquals(JsonNodeFactory.instance.numberNode(2.0), expression.evaluate(null));
-//    }
     {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
       expression.registerJsFunction("foo", "function(a) {return a + a}", "<n:n>");
@@ -127,6 +122,30 @@ public class JSONataExpressionTests {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
       expression.registerJsFunction("foo", "function(a) {return a + a}", null);
       assertEquals(JsonNodeFactory.instance.numberNode(2.0), expression.evaluate(null));
+    }
+    {
+      final JSONataExpression expression = jsonata.parse("$foo(1)");
+      expression.registerJsFunction("foo", "function(a) {return a + a}", "<s:s>");
+      assertThrows(JSONataException.class, () -> expression.evaluate(null));
+    }
+  }
+
+  @Test
+  public void testRegisterJsLambda() {
+    {
+      final JSONataExpression expression = jsonata.parse("$foo(1)");
+      expression.registerJsLambda("foo", "a => a + a", "<n:n>");
+      assertEquals(JsonNodeFactory.instance.numberNode(2.0), expression.evaluate(null));
+    }
+    {
+      final JSONataExpression expression = jsonata.parse("$foo(1)");
+      expression.registerJsLambda("foo", "a => a + a", null);
+      assertEquals(JsonNodeFactory.instance.numberNode(2.0), expression.evaluate(null));
+    }
+    {
+      final JSONataExpression expression = jsonata.parse("$foo(1)");
+      expression.registerJsLambda("foo", "a => a + a", "<s:s>");
+      assertThrows(JSONataException.class, () -> expression.evaluate(null));
     }
   }
 

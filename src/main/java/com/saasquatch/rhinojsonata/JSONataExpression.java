@@ -84,4 +84,15 @@ public final class JSONataExpression {
     }
   }
 
+  public void registerJsLambda(@Nonnull String name, @Nonnull String jsLambdaExpression,
+      @Nullable String signature) {
+    try {
+      ScriptableObject.callMethod(expressionNativeObject, REGISTER_FUNCTION,
+          new Object[]{name, cx.evaluateString(scope, jsLambdaExpression, null, 1, null),
+              signature == null ? Undefined.instance : signature});
+    } catch (RhinoException e) {
+      rethrowRhinoException(cx, scope, e);
+    }
+  }
+
 }
