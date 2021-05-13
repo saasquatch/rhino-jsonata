@@ -7,14 +7,14 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public final class JSONataExpressionOptions {
+public final class JSONataOptions {
 
   final Duration timeout;
   final int maxDepth;
   final ObjectMapper objectMapper;
   final String jsonataJsSource;
 
-  private JSONataExpressionOptions(@Nullable Duration timeout, int maxDepth,
+  private JSONataOptions(@Nullable Duration timeout, int maxDepth,
       @Nullable ObjectMapper objectMapper, @Nullable String jsonataJsSource) {
     this.timeout = timeout;
     this.maxDepth = maxDepth;
@@ -58,8 +58,8 @@ public final class JSONataExpressionOptions {
       return this;
     }
 
-    public JSONataExpressionOptions build() {
-      return new JSONataExpressionOptions(timeout, maxDepth, objectMapper, jsonataJsSource);
+    public JSONataOptions build() {
+      return new JSONataOptions(timeout, maxDepth, objectMapper, jsonataJsSource);
     }
 
   }

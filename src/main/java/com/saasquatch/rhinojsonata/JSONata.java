@@ -18,10 +18,10 @@ public final class JSONata {
   private final Context cx;
   private final Scriptable scope;
   private final ObjectMapper objectMapper;
-  private final JSONataExpressionOptions options;
+  private final JSONataOptions options;
 
   private JSONata(@Nonnull Context cx, @Nonnull Scriptable scope,
-      @Nonnull ObjectMapper objectMapper, @Nonnull JSONataExpressionOptions options) {
+      @Nonnull ObjectMapper objectMapper, @Nonnull JSONataOptions options) {
     this.cx = cx;
     this.scope = scope;
     this.objectMapper = objectMapper;
@@ -41,7 +41,7 @@ public final class JSONata {
   }
 
   private void applyOptions(@Nonnull NativeObject jsonataObject,
-      @Nonnull JSONataExpressionOptions options) {
+      @Nonnull JSONataOptions options) {
     if (options.timeout != null) {
       cx.compileFunction(scope, TIMEBOX_EXPRESSION_JS, null, 1, null)
           .call(cx, scope, scope,
@@ -50,10 +50,10 @@ public final class JSONata {
   }
 
   public static JSONata create() {
-    return create(JSONataExpressionOptions.newBuilder().build());
+    return create(JSONataOptions.newBuilder().build());
   }
 
-  public static JSONata create(@Nonnull JSONataExpressionOptions options) {
+  public static JSONata create(@Nonnull JSONataOptions options) {
     final String jsonataJsString =
         options.jsonataJsSource == null ? getDefaultJSONataSource() : options.jsonataJsSource;
     final Context cx = Context.enter();
