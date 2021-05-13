@@ -109,9 +109,9 @@ public final class JSONataExpression {
   private static void applyOptions(Context cx, Scriptable scope, NativeObject jsonataObject,
       JSONataExpressionOptions options) {
     if (options.timeout != null) {
-      cx.evaluateString(scope, TIMEBOX_EXPRESSION_JS, null, 1, null);
-      ScriptableObject.callMethod(scope, "timeboxExpression",
-          new Object[]{jsonataObject, options.timeout.toMillis(), options.maxDepth});
+      cx.compileFunction(scope, TIMEBOX_EXPRESSION_JS, null, 1, null)
+          .call(cx, scope, scope,
+              new Object[]{jsonataObject, options.timeout.toMillis(), options.maxDepth});
     }
   }
 
