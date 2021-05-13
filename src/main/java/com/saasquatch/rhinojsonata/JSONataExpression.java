@@ -1,5 +1,7 @@
 package com.saasquatch.rhinojsonata;
 
+import static com.saasquatch.rhinojsonata.JunkDrawer.ASSIGN;
+import static com.saasquatch.rhinojsonata.JunkDrawer.REGISTER_FUNCTION;
 import static com.saasquatch.rhinojsonata.JunkDrawer.TIMEBOX_EXPRESSION_JS;
 import static com.saasquatch.rhinojsonata.JunkDrawer.getDefaultJSONataSource;
 import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
@@ -8,12 +10,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.io.IOException;
-import java.lang.reflect.Member;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.FunctionObject;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
@@ -55,7 +55,7 @@ public final class JSONataExpression {
 
   public void assignJsExpression(@Nonnull String name, @Nonnull String jsExpression) {
     try {
-      ScriptableObject.callMethod(jsonataObject, "assign",
+      ScriptableObject.callMethod(jsonataObject, ASSIGN,
           new Object[]{name, cx.evaluateString(scope, jsExpression, null, 1, null)});
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
@@ -64,17 +64,8 @@ public final class JSONataExpression {
 
   public void assignJavaObject(@Nonnull String name, @Nonnull Object javaObject) {
     try {
-      ScriptableObject.callMethod(jsonataObject, "assign",
+      ScriptableObject.callMethod(jsonataObject, ASSIGN,
           new Object[]{name, Context.javaToJS(javaObject, scope)});
-    } catch (RhinoException e) {
-      rethrowRhinoException(cx, scope, e);
-    }
-  }
-
-  public void assignJavaMember(@Nonnull String name, @Nonnull Member javaMember) {
-    try {
-      ScriptableObject.callMethod(jsonataObject, "assign",
-          new Object[]{name, new FunctionObject(name, javaMember, scope)});
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
     }
@@ -83,19 +74,9 @@ public final class JSONataExpression {
   public void registerJsFunction(@Nonnull String name, @Nonnull String jsFunctionExpression,
       @Nullable String signature) {
     try {
-      ScriptableObject.callMethod(jsonataObject, "registerFunction",
+      ScriptableObject.callMethod(jsonataObject, REGISTER_FUNCTION,
           new Object[]{name, cx.evaluateString(scope, jsFunctionExpression, null, 1, null),
               signature});
-    } catch (RhinoException e) {
-      rethrowRhinoException(cx, scope, e);
-    }
-  }
-
-  public void registerJavaMemberFunction(@Nonnull String name, @Nonnull Member javaMember,
-      @Nullable String signature) {
-    try {
-      ScriptableObject.callMethod(jsonataObject, "assign",
-          new Object[]{name, new FunctionObject(name, javaMember, scope), signature});
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
     }

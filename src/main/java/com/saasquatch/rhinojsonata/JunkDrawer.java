@@ -14,6 +14,10 @@ import org.mozilla.javascript.Scriptable;
 
 final class JunkDrawer {
 
+  public static final String JS = "js", JSON_STRINGIFY = "JSON.stringify",
+      JSON_PARSE = "JSON.parse", EVALUATE = "evaluate", ASSIGN = "assign",
+      REGISTER_FUNCTION = "registerFunction";
+
   /**
    * The code comes from https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158
    * It is licenced under MIT License
