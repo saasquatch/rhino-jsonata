@@ -84,7 +84,7 @@ public final class JSONataExpression {
     }
   }
 
-  public void registerJsLambda(@Nonnull String name, @Nonnull String jsLambdaExpression,
+  public void registerJsArrowFunction(@Nonnull String name, @Nonnull String jsLambdaExpression,
       @Nullable String signature) {
     try {
       ScriptableObject.callMethod(expressionNativeObject, REGISTER_FUNCTION,
