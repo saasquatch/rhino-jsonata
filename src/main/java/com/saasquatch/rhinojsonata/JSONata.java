@@ -21,14 +21,12 @@ public final class JSONata {
   final Context cx;
   final Scriptable scope;
   final ObjectMapper objectMapper;
-  final JSONataOptions options;
 
   private JSONata(@Nonnull Context cx, @Nonnull Scriptable scope,
-      @Nonnull ObjectMapper objectMapper, @Nonnull JSONataOptions options) {
+      @Nonnull ObjectMapper objectMapper) {
     this.cx = cx;
     this.scope = scope;
     this.objectMapper = objectMapper;
-    this.options = options;
   }
 
   public JSONataExpression parse(@Nonnull String expression) {
@@ -62,7 +60,7 @@ public final class JSONata {
     try {
       cx.evaluateString(scope, jsonataJsString, null, 1, null);
       return new JSONata(cx, scope,
-          options.objectMapper == null ? new ObjectMapper() : options.objectMapper, options);
+          options.objectMapper == null ? new ObjectMapper() : options.objectMapper);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
     }
