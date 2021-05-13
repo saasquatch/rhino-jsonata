@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.util.function.UnaryOperator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -147,6 +148,20 @@ public class JSONataExpressionTests {
       expression.registerJsArrowFunction("foo", "a => a + a", "<s:s>");
       assertThrows(JSONataException.class, () -> expression.evaluate(null));
     }
+  }
+
+  @SuppressWarnings("ConstantConditions")
+  @Test
+  public void testTimeboxValidation() {
+    final JSONataExpression expression = jsonata.parse("1");
+    assertThrows(NullPointerException.class, () -> expression.timeboxExpression(null, 1000));
+    assertThrows(IllegalArgumentException.class, () -> expression.timeboxExpression(
+        Duration.ofSeconds(-1), 1000));
+    assertThrows(IllegalArgumentException.class, () -> expression.timeboxExpression(
+        Duration.ofSeconds(1), -1000));
+    assertDoesNotThrow(() -> expression.timeboxExpression(Duration.ofSeconds(1), 1000));
+    assertThrows(IllegalStateException.class,
+        () -> expression.timeboxExpression(Duration.ofSeconds(1), 1000));
   }
 
 }
