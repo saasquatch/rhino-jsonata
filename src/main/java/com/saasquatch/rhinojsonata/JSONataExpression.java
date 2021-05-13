@@ -40,15 +40,23 @@ public final class JSONataExpression {
   }
 
   public JsonNode evaluate() {
-    return evaluate(null);
+    return evaluate(JsonNodeFactory.instance.missingNode());
   }
 
   public JsonNode evaluate(@Nullable JsonNode input) {
     final Object evaluateResult;
     try {
-      final String inputStringify = objectMapper.writeValueAsString(input);
+      final Object inputNativeObject;
+      if (input == null) {
+        inputNativeObject = null;
+      } else if (input.isMissingNode()) {
+        inputNativeObject = Undefined.instance;
+      } else {
+        final String inputStringify = objectMapper.writeValueAsString(input);
+        inputNativeObject = new JsonParser(cx, scope).parseValue(inputStringify);
+      }
       evaluateResult = ScriptableObject.callMethod(expressionNativeObject, EVALUATE,
-          new Object[]{new JsonParser(cx, scope).parseValue(inputStringify)});
+          new Object[]{inputNativeObject});
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
     } catch (JsonParser.ParseException | IOException e) {

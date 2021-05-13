@@ -52,6 +52,28 @@ public class JSONataExpressionTests {
   }
 
   @Test
+  public void testEvaluationOfDifferentTypes() {
+    assertEquals(JsonNodeFactory.instance.missingNode(), jsonata.parse("$$").evaluate());
+    assertEquals(JsonNodeFactory.instance.nullNode(), jsonata.parse("$$").evaluate(null));
+    assertEquals(JsonNodeFactory.instance.missingNode(),
+        jsonata.parse("$$").evaluate(JsonNodeFactory.instance.missingNode()));
+    assertEquals(JsonNodeFactory.instance.nullNode(),
+        jsonata.parse("$$").evaluate(JsonNodeFactory.instance.nullNode()));
+    assertEquals(JsonNodeFactory.instance.booleanNode(true),
+        jsonata.parse("$$").evaluate(JsonNodeFactory.instance.booleanNode(true)));
+    assertEquals(JsonNodeFactory.instance.textNode("lol"),
+        jsonata.parse("$$").evaluate(JsonNodeFactory.instance.textNode("lol")));
+    assertEquals(JsonNodeFactory.instance.numberNode(1),
+        jsonata.parse("$$").evaluate(JsonNodeFactory.instance.numberNode(1)));
+    assertEquals(JsonNodeFactory.instance.nullNode(),
+        jsonata.parse("foo").evaluate(JsonNodeFactory.instance.objectNode()
+            .put("foo", (String) null)));
+    assertEquals(JsonNodeFactory.instance.missingNode(),
+        jsonata.parse("foo").evaluate(JsonNodeFactory.instance.objectNode()
+            .put("bar", (String) null)));
+  }
+
+  @Test
   public void testAssignJsExpression() {
     {
       final JSONataExpression expression = jsonata.parse("$foo");
