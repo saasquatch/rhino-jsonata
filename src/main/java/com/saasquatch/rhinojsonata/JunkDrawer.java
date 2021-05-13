@@ -61,15 +61,19 @@ final class JunkDrawer {
   // Lazy init
   private static String defaultJSONataSource;
 
-  private JunkDrawer() {
-  }
+  private JunkDrawer() {}
 
   public static <T> T rethrowRhinoException(Context cx, Scriptable scope, RhinoException e) {
     if (e instanceof JavaScriptException) {
       final Object embeddedJsValue = ((JavaScriptException) e).getValue();
       final String message;
-      if (embeddedJsValue instanceof CharSequence) {
+      if (embeddedJsValue == null) {
+        message = e.getMessage();
+      } else if (embeddedJsValue instanceof CharSequence) {
         message = embeddedJsValue.toString();
+      } else if (embeddedJsValue.getClass().getSimpleName().equals("NativeError")) {
+        // The NativeError class isn't accessible
+        message = e.getMessage();
       } else {
         message = NativeJSON.stringify(cx, scope, embeddedJsValue, null, null).toString();
       }

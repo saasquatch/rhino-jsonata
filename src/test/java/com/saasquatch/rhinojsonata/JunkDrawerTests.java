@@ -49,6 +49,16 @@ public class JunkDrawerTests {
       }
     }
     try {
+      cx.evaluateString(scope, "throw new Error('foo')", null, 1, null);
+      fail();
+    } catch (RhinoException e) {
+      try {
+        rethrowRhinoException(cx, scope, e);
+      } catch (JSONataException e2) {
+        assertTrue(e2.getMessage().startsWith("Error: foo"));
+      }
+    }
+    try {
       cx.evaluateString(scope, "throw 1", null, 1, null);
       fail();
     } catch (RhinoException e) {
