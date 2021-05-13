@@ -3,15 +3,12 @@ package com.saasquatch.rhinojsonata;
 import static com.saasquatch.rhinojsonata.JunkDrawer.ASSIGN;
 import static com.saasquatch.rhinojsonata.JunkDrawer.EVALUATE;
 import static com.saasquatch.rhinojsonata.JunkDrawer.REGISTER_FUNCTION;
-import static com.saasquatch.rhinojsonata.JunkDrawer.TIMEBOX_EXPRESSION_JS;
-import static com.saasquatch.rhinojsonata.JunkDrawer.getDefaultJSONataSource;
 import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.io.IOException;
-import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.mozilla.javascript.Context;
@@ -26,23 +23,23 @@ public final class JSONataExpression {
 
   private final Context cx;
   private final Scriptable scope;
-  private final NativeObject jsonataObject;
   private final ObjectMapper objectMapper;
+  private final NativeObject jsonataObject;
 
-  private JSONataExpression(@Nonnull Context cx, @Nonnull Scriptable scope,
-      @Nonnull NativeObject jsonataObject, @Nonnull ObjectMapper objectMapper) {
+  JSONataExpression(@Nonnull Context cx, @Nonnull Scriptable scope,
+      @Nonnull ObjectMapper objectMapper, @Nonnull NativeObject jsonataObject) {
     this.cx = cx;
     this.scope = scope;
-    this.jsonataObject = jsonataObject;
     this.objectMapper = objectMapper;
+    this.jsonataObject = jsonataObject;
   }
 
   public JsonNode evaluate(@Nullable JsonNode input) {
     final Object evaluateResult;
     try {
+      final String inputStringify = objectMapper.writeValueAsString(input);
       evaluateResult = ScriptableObject.callMethod(jsonataObject, EVALUATE,
-          new Object[]{
-              new JsonParser(cx, scope).parseValue(objectMapper.writeValueAsString(input))});
+          new Object[]{new JsonParser(cx, scope).parseValue(inputStringify)});
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
     } catch (JsonParser.ParseException | IOException e) {
@@ -84,38 +81,6 @@ public final class JSONataExpression {
               signature == null ? Undefined.instance : signature});
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
-    }
-  }
-
-  public static JSONataExpression parse(@Nonnull String expression) {
-    return parse(expression, JSONataExpressionOptions.newBuilder().build());
-  }
-
-  public static JSONataExpression parse(@Nonnull String expression,
-      @Nonnull JSONataExpressionOptions options) {
-    Objects.requireNonNull(expression);
-    final String jsonataJsString =
-        options.jsonataJsSource == null ? getDefaultJSONataSource() : options.jsonataJsSource;
-    final Context cx = Context.enter();
-    final Scriptable scope = cx.initSafeStandardObjects();
-    try {
-      cx.evaluateString(scope, jsonataJsString, null, 1, null);
-      final NativeObject jsonataObject = (NativeObject) ScriptableObject.callMethod(
-          scope, "jsonata", new Object[]{expression});
-      applyOptions(cx, scope, jsonataObject, options);
-      return new JSONataExpression(cx, scope, jsonataObject,
-          options.objectMapper == null ? new ObjectMapper() : options.objectMapper);
-    } catch (RhinoException e) {
-      return rethrowRhinoException(cx, scope, e);
-    }
-  }
-
-  private static void applyOptions(Context cx, Scriptable scope, NativeObject jsonataObject,
-      JSONataExpressionOptions options) {
-    if (options.timeout != null) {
-      cx.compileFunction(scope, TIMEBOX_EXPRESSION_JS, null, 1, null)
-          .call(cx, scope, scope,
-              new Object[]{jsonataObject, options.timeout.toMillis(), options.maxDepth});
     }
   }
 
