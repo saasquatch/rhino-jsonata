@@ -76,7 +76,7 @@ public final class JSONataExpression {
       @Nullable String signature) {
     try {
       ScriptableObject.callMethod(jsonataObject, REGISTER_FUNCTION,
-          new Object[]{name, cx.evaluateString(scope, jsFunctionExpression, null, 1, null),
+          new Object[]{name, cx.compileFunction(scope, jsFunctionExpression, null, 1, null),
               signature});
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
