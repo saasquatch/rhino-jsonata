@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import java.nio.ByteBuffer;
+import java.util.function.UnaryOperator;
 import org.junit.jupiter.api.Test;
 
 public class JSONataExpressionTests {
@@ -70,6 +72,34 @@ public class JSONataExpressionTests {
       final JSONataExpression expression = JSONataExpression.parse("$foo('1')");
       expression.assignJsExpression("foo", "a => a + a");
       assertEquals(JsonNodeFactory.instance.textNode("11"), expression.evaluate(null));
+    }
+  }
+
+  @Test
+  public void testAssignJavaObject() {
+    {
+      final JSONataExpression expression = JSONataExpression.parse("$foo");
+      assertEquals(JsonNodeFactory.instance.missingNode(), expression.evaluate(null));
+    }
+    {
+      final JSONataExpression expression = JSONataExpression.parse("$foo");
+      expression.assignJavaObject("foo", 1);
+      assertEquals(JsonNodeFactory.instance.numberNode(1), expression.evaluate(null));
+    }
+    {
+      final JSONataExpression expression = JSONataExpression.parse("$foo");
+      expression.assignJavaObject("foo", "1");
+      assertEquals(JsonNodeFactory.instance.textNode("1"), expression.evaluate(null));
+    }
+    {
+      final JSONataExpression expression = JSONataExpression.parse("$foo");
+      expression.assignJavaObject("foo", ByteBuffer.allocate(1));
+      assertThrows(JSONataException.class, () -> expression.evaluate(null));
+    }
+    {
+      final JSONataExpression expression = JSONataExpression.parse("$foo");
+      expression.assignJavaObject("foo", (UnaryOperator<String>) s -> s + s);
+      assertThrows(JSONataException.class, () -> expression.evaluate(null));
     }
   }
 
