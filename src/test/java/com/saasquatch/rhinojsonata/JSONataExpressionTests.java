@@ -164,4 +164,29 @@ public class JSONataExpressionTests {
         () -> expression.timeboxExpression(Duration.ofSeconds(1), 1000));
   }
 
+  @Test
+  public void testTimeboxTimeout() {
+    final JSONataExpression expression = jsonata.parse("($f1 := function($x) { $f1($x) }; $f1(1))");
+    expression.timeboxExpression(Duration.ofMillis(500), Integer.MAX_VALUE);
+    try {
+      expression.evaluate();
+      fail();
+    } catch (JSONataException e) {
+      assertTrue(e.getMessage().contains("timeout"));
+    }
+  }
+
+  @Test
+  public void testTimeboxMaxDepth() {
+    final JSONataExpression expression = jsonata.parse(
+        "($f1 := function($x) { $f1($x) + $f1($x) }; $f1(1))");
+    expression.timeboxExpression(Duration.ofDays(1), 10);
+    try {
+      expression.evaluate();
+      fail();
+    } catch (JSONataException e) {
+      assertTrue(e.getMessage().contains("Stack overflow"));
+    }
+  }
+
 }
