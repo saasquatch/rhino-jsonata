@@ -51,7 +51,11 @@ public final class JSONataExpression {
     if (evaluateResult instanceof Undefined) {
       return JsonNodeFactory.instance.missingNode();
     }
-    return objectMapper.valueToTree(evaluateResult);
+    try {
+      return objectMapper.valueToTree(evaluateResult);
+    } catch (IllegalArgumentException e) {
+      throw new JSONataException(e.getMessage(), e);
+    }
   }
 
   public void assignJsExpression(@Nonnull String name, @Nonnull String jsExpression) {
