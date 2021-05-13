@@ -2,11 +2,11 @@ package com.saasquatch.rhinojsonata;
 
 import static com.saasquatch.rhinojsonata.JunkDrawer.getDefaultJSONataSource;
 import static com.saasquatch.rhinojsonata.JunkDrawer.readerToString;
+import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
@@ -15,42 +15,44 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.Scriptable;
 
 public class JunkDrawerTests {
 
-//  @Test
-//  public void testRethrowPolyglotException() {
-//    try {
-//      context.eval(JS, "throw {foo:true}");
-//    } catch (PolyglotException e) {
-//      assertThrows(JSONataException.class, () -> rethrowPolyglotException(context, e));
-//      try {
-//        rethrowPolyglotException(context, e);
-//      } catch (JSONataException e2) {
-//        assertEquals("{\"foo\":true}", e2.getMessage());
-//      }
-//    }
-//    try {
-//      context.eval(JS, "throw \"foo\"");
-//    } catch (PolyglotException e) {
-//      assertThrows(JSONataException.class, () -> rethrowPolyglotException(context, e));
-//      try {
-//        rethrowPolyglotException(context, e);
-//      } catch (JSONataException e2) {
-//        assertEquals("foo", e2.getMessage());
-//      }
-//    }
-//    try {
-//      context.eval(JS, "throw 1");
-//    } catch (PolyglotException e) {
-//      assertThrows(JSONataException.class, () -> rethrowPolyglotException(context, e));
-//      try {
-//        rethrowPolyglotException(context, e);
-//      } catch (JSONataException e2) {
-//        assertEquals("1", e2.getMessage());
-//      }
-//    }
-//  }
+  @Test
+  public void testRethrowRhinoException() {
+    final Context cx = Context.enter();
+    final Scriptable scope = cx.initSafeStandardObjects();
+    try {
+      cx.evaluateString(scope, "throw {foo:true}", null, 1, null);
+    } catch (RhinoException e) {
+      try {
+        rethrowRhinoException(cx, scope, e);
+      } catch (JSONataException e2) {
+        assertEquals("{\"foo\":true}", e2.getMessage());
+      }
+    }
+    try {
+      cx.evaluateString(scope, "throw 'foo'", null, 1, null);
+    } catch (RhinoException e) {
+      try {
+        rethrowRhinoException(cx, scope, e);
+      } catch (JSONataException e2) {
+        assertEquals("foo", e2.getMessage());
+      }
+    }
+    try {
+      cx.evaluateString(scope, "throw 1", null, 1, null);
+    } catch (RhinoException e) {
+      try {
+        rethrowRhinoException(cx, scope, e);
+      } catch (JSONataException e2) {
+        assertEquals("1", e2.getMessage());
+      }
+    }
+  }
 
   @Test
   public void testReaderToString() throws Exception {
