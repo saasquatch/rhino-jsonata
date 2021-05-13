@@ -1,6 +1,7 @@
 package com.saasquatch.rhinojsonata;
 
 import static com.saasquatch.rhinojsonata.JunkDrawer.ASSIGN;
+import static com.saasquatch.rhinojsonata.JunkDrawer.EVALUATE;
 import static com.saasquatch.rhinojsonata.JunkDrawer.REGISTER_FUNCTION;
 import static com.saasquatch.rhinojsonata.JunkDrawer.TIMEBOX_EXPRESSION_JS;
 import static com.saasquatch.rhinojsonata.JunkDrawer.getDefaultJSONataSource;
@@ -39,7 +40,7 @@ public final class JSONataExpression {
   public JsonNode evaluate(@Nullable JsonNode input) {
     final Object evaluateResult;
     try {
-      evaluateResult = ScriptableObject.callMethod(jsonataObject, "evaluate",
+      evaluateResult = ScriptableObject.callMethod(jsonataObject, EVALUATE,
           new Object[]{
               new JsonParser(cx, scope).parseValue(objectMapper.writeValueAsString(input))});
     } catch (RhinoException e) {

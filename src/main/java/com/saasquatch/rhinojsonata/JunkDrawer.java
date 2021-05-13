@@ -14,8 +14,7 @@ import org.mozilla.javascript.Scriptable;
 
 final class JunkDrawer {
 
-  public static final String JS = "js", JSON_STRINGIFY = "JSON.stringify",
-      JSON_PARSE = "JSON.parse", EVALUATE = "evaluate", ASSIGN = "assign",
+  public static final String JS = "js", EVALUATE = "evaluate", ASSIGN = "assign",
       REGISTER_FUNCTION = "registerFunction";
 
   /**
