@@ -31,21 +31,21 @@ public final class JSONata {
   public JSONataExpression parse(@Nonnull String expression) {
     Objects.requireNonNull(expression);
     try {
-      final NativeObject jsonataObject = (NativeObject) ScriptableObject.callMethod(
+      final NativeObject expressionNativeObject = (NativeObject) ScriptableObject.callMethod(
           scope, "jsonata", new Object[]{expression});
-      applyOptions(jsonataObject, options);
-      return new JSONataExpression(cx, scope, objectMapper, jsonataObject);
+      applyOptionsToExpression(expressionNativeObject, options);
+      return new JSONataExpression(cx, scope, objectMapper, expressionNativeObject);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
     }
   }
 
-  private void applyOptions(@Nonnull NativeObject jsonataObject,
+  private void applyOptionsToExpression(@Nonnull NativeObject expressionNativeObject,
       @Nonnull JSONataOptions options) {
     if (options.timeout != null) {
       cx.compileFunction(scope, TIMEBOX_EXPRESSION_JS, null, 1, null)
           .call(cx, scope, scope,
-              new Object[]{jsonataObject, options.timeout.toMillis(), options.maxDepth});
+              new Object[]{expressionNativeObject, options.timeout.toMillis(), options.maxDepth});
     }
   }
 

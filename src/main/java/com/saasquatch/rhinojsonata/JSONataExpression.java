@@ -24,21 +24,21 @@ public final class JSONataExpression {
   private final Context cx;
   private final Scriptable scope;
   private final ObjectMapper objectMapper;
-  private final NativeObject jsonataObject;
+  private final NativeObject expressionNativeObject;
 
   JSONataExpression(@Nonnull Context cx, @Nonnull Scriptable scope,
-      @Nonnull ObjectMapper objectMapper, @Nonnull NativeObject jsonataObject) {
+      @Nonnull ObjectMapper objectMapper, @Nonnull NativeObject expressionNativeObject) {
     this.cx = cx;
     this.scope = scope;
     this.objectMapper = objectMapper;
-    this.jsonataObject = jsonataObject;
+    this.expressionNativeObject = expressionNativeObject;
   }
 
   public JsonNode evaluate(@Nullable JsonNode input) {
     final Object evaluateResult;
     try {
       final String inputStringify = objectMapper.writeValueAsString(input);
-      evaluateResult = ScriptableObject.callMethod(jsonataObject, EVALUATE,
+      evaluateResult = ScriptableObject.callMethod(expressionNativeObject, EVALUATE,
           new Object[]{new JsonParser(cx, scope).parseValue(inputStringify)});
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
@@ -57,7 +57,7 @@ public final class JSONataExpression {
 
   public void assignJsExpression(@Nonnull String name, @Nonnull String jsExpression) {
     try {
-      ScriptableObject.callMethod(jsonataObject, ASSIGN,
+      ScriptableObject.callMethod(expressionNativeObject, ASSIGN,
           new Object[]{name, cx.evaluateString(scope, jsExpression, null, 1, null)});
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
@@ -66,7 +66,7 @@ public final class JSONataExpression {
 
   public void assignJavaObject(@Nonnull String name, @Nonnull Object javaObject) {
     try {
-      ScriptableObject.callMethod(jsonataObject, ASSIGN,
+      ScriptableObject.callMethod(expressionNativeObject, ASSIGN,
           new Object[]{name, Context.javaToJS(javaObject, scope)});
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
@@ -76,7 +76,7 @@ public final class JSONataExpression {
   public void registerJsFunction(@Nonnull String name, @Nonnull String jsFunctionExpression,
       @Nullable String signature) {
     try {
-      ScriptableObject.callMethod(jsonataObject, REGISTER_FUNCTION,
+      ScriptableObject.callMethod(expressionNativeObject, REGISTER_FUNCTION,
           new Object[]{name, cx.compileFunction(scope, jsFunctionExpression, null, 1, null),
               signature == null ? Undefined.instance : signature});
     } catch (RhinoException e) {
