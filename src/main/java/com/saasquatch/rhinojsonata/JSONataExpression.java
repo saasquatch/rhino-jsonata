@@ -34,6 +34,10 @@ public final class JSONataExpression {
     this.expressionNativeObject = expressionNativeObject;
   }
 
+  public JsonNode evaluate() {
+    return evaluate(null);
+  }
+
   public JsonNode evaluate(@Nullable JsonNode input) {
     final Object evaluateResult;
     try {

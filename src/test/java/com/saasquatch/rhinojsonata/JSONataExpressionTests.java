@@ -41,13 +41,13 @@ public class JSONataExpressionTests {
   @Test
   public void testEvaluateBasic() {
     assertEquals(JsonNodeFactory.instance.missingNode(),
-        jsonata.parse("foo").evaluate(null));
+        jsonata.parse("foo").evaluate());
     assertEquals(JsonNodeFactory.instance.missingNode(),
         jsonata.parse("foo").evaluate(JsonNodeFactory.instance.textNode("foo")));
     assertEquals(JsonNodeFactory.instance.nullNode(),
         jsonata.parse("null").evaluate(JsonNodeFactory.instance.textNode("foo")));
     assertEquals(JsonNodeFactory.instance.objectNode(),
-        jsonata.parse("{\"foo\":bar}").evaluate(null));
+        jsonata.parse("{\"foo\":bar}").evaluate());
   }
 
   @Test
