@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.io.IOException;
+import java.time.Duration;
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.mozilla.javascript.Context;
@@ -24,13 +26,14 @@ public final class JSONataExpression {
   private final Context cx;
   private final Scriptable scope;
   private final ObjectMapper objectMapper;
+  private final JSONata jsonata;
   private final NativeObject expressionNativeObject;
 
-  JSONataExpression(@Nonnull Context cx, @Nonnull Scriptable scope,
-      @Nonnull ObjectMapper objectMapper, @Nonnull NativeObject expressionNativeObject) {
-    this.cx = cx;
-    this.scope = scope;
-    this.objectMapper = objectMapper;
+  JSONataExpression(@Nonnull JSONata jsonata, @Nonnull NativeObject expressionNativeObject) {
+    this.cx = jsonata.cx;
+    this.scope = jsonata.scope;
+    this.objectMapper = jsonata.objectMapper;
+    this.jsonata = jsonata;
     this.expressionNativeObject = expressionNativeObject;
   }
 
@@ -97,6 +100,18 @@ public final class JSONataExpression {
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
     }
+  }
+
+  public void timeboxExpression(@Nonnull Duration timeout, @Nonnegative int maxDepth) {
+    if (timeout.isNegative()) {
+      throw new IllegalArgumentException("timeout cannot be negative");
+    }
+    //noinspection ConstantConditions
+    if (maxDepth < 0) {
+      throw new IllegalArgumentException("maxDepth cannot be negative");
+    }
+    jsonata.getTimeboxExpressionFunction().call(cx, scope, scope,
+        new Object[]{expressionNativeObject, timeout.toMillis(), maxDepth});
   }
 
 }

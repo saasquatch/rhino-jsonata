@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
@@ -15,10 +16,12 @@ import org.mozilla.javascript.ScriptableObject;
 
 public final class JSONata {
 
-  private final Context cx;
-  private final Scriptable scope;
-  private final ObjectMapper objectMapper;
-  private final JSONataOptions options;
+  // Lazy init
+  private Function timeboxFunction;
+  final Context cx;
+  final Scriptable scope;
+  final ObjectMapper objectMapper;
+  final JSONataOptions options;
 
   private JSONata(@Nonnull Context cx, @Nonnull Scriptable scope,
       @Nonnull ObjectMapper objectMapper, @Nonnull JSONataOptions options) {
@@ -33,20 +36,18 @@ public final class JSONata {
     try {
       final NativeObject expressionNativeObject = (NativeObject) ScriptableObject.callMethod(
           scope, "jsonata", new Object[]{expression});
-      applyOptionsToExpression(expressionNativeObject, options);
-      return new JSONataExpression(cx, scope, objectMapper, expressionNativeObject);
+      return new JSONataExpression(this, expressionNativeObject);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
     }
   }
 
-  private void applyOptionsToExpression(@Nonnull NativeObject expressionNativeObject,
-      @Nonnull JSONataOptions options) {
-    if (options.timeout != null) {
-      cx.compileFunction(scope, TIMEBOX_EXPRESSION_JS, null, 1, null)
-          .call(cx, scope, scope,
-              new Object[]{expressionNativeObject, options.timeout.toMillis(), options.maxDepth});
+  Function getTimeboxExpressionFunction() {
+    Function f = timeboxFunction;
+    if (f == null) {
+      timeboxFunction = f = cx.compileFunction(scope, TIMEBOX_EXPRESSION_JS, null, 1, null);
     }
+    return f;
   }
 
   public static JSONata create() {
