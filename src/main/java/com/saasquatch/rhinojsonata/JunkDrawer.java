@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Objects;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.NativeJSON;
@@ -100,7 +101,8 @@ final class JunkDrawer {
     try (
         InputStream jsonataSourceStream = JSONataExpression.class.getResourceAsStream(
             "/saasquatch-jsonata-es5.min.js");
-        Reader jsonataSourceReader = new InputStreamReader(jsonataSourceStream, UTF_8);
+        Reader jsonataSourceReader = new InputStreamReader(
+            Objects.requireNonNull(jsonataSourceStream), UTF_8);
     ) {
       return readerToString(jsonataSourceReader);
     } catch (IOException e) {
