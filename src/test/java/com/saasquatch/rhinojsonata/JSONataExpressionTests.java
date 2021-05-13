@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 
 public class JSONataExpressionTests {
@@ -43,25 +42,34 @@ public class JSONataExpressionTests {
 
   @Test
   public void testAssignJsExpression() {
-    final Supplier<JSONataExpression> supplier = () -> JSONataExpression.parse("$foo");
     {
-      final JSONataExpression expression = supplier.get();
+      final JSONataExpression expression = JSONataExpression.parse("$foo");
       assertEquals(JsonNodeFactory.instance.missingNode(), expression.evaluate(null));
     }
     {
-      final JSONataExpression expression = supplier.get();
+      final JSONataExpression expression = JSONataExpression.parse("$foo");
       expression.assignJsExpression("foo", "1");
       assertEquals(JsonNodeFactory.instance.numberNode(1.0), expression.evaluate(null));
     }
     {
-      final JSONataExpression expression = supplier.get();
+      final JSONataExpression expression = JSONataExpression.parse("$foo");
       expression.assignJsExpression("foo", "'1'");
       assertEquals(JsonNodeFactory.instance.textNode("1"), expression.evaluate(null));
     }
     {
-      final JSONataExpression expression = supplier.get();
+      final JSONataExpression expression = JSONataExpression.parse("$foo");
       expression.assignJsExpression("foo", "a => a + a");
       assertThrows(JSONataException.class, () -> expression.evaluate(null));
+    }
+    {
+      final JSONataExpression expression = JSONataExpression.parse("$foo(1)");
+      expression.assignJsExpression("foo", "a => a + a");
+      assertEquals(JsonNodeFactory.instance.numberNode(2.0), expression.evaluate(null));
+    }
+    {
+      final JSONataExpression expression = JSONataExpression.parse("$foo('1')");
+      expression.assignJsExpression("foo", "a => a + a");
+      assertEquals(JsonNodeFactory.instance.textNode("11"), expression.evaluate(null));
     }
   }
 
