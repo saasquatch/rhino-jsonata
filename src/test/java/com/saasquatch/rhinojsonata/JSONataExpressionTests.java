@@ -115,6 +115,11 @@ public class JSONataExpressionTests {
       expression.registerJsFunction("foo", "function(a) {return a + a}", "<n:n>");
       assertEquals(JsonNodeFactory.instance.numberNode(2.0), expression.evaluate(null));
     }
+    {
+      final JSONataExpression expression = JSONataExpression.parse("$foo(1)");
+      expression.registerJsFunction("foo", "function(a) {return a + a}", null);
+      assertEquals(JsonNodeFactory.instance.numberNode(2.0), expression.evaluate(null));
+    }
   }
 
 }
