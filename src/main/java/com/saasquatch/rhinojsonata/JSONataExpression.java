@@ -125,8 +125,12 @@ public final class JSONataExpression {
     if (maxDepth <= 0) {
       throw new IllegalArgumentException("maxDepth has to be positive");
     }
-    jsonata.getTimeboxExpressionFunction().call(cx, scope, scope,
-        new Object[]{expressionNativeObject, timeoutMillis, maxDepth});
+    try {
+      jsonata.getTimeboxExpressionFunction().call(cx, scope, scope,
+          new Object[]{expressionNativeObject, timeoutMillis, maxDepth});
+    } catch (RhinoException e) {
+      rethrowRhinoException(cx, scope, e);
+    }
   }
 
 }
