@@ -94,7 +94,12 @@ final class JunkDrawer {
       return null;
     } else if (jsonNode.isMissingNode()) {
       return Undefined.instance;
+    } else if (jsonNode.isBoolean()) {
+      return jsonNode.booleanValue();
+    } else if (jsonNode.isTextual()) {
+      return jsonNode.textValue();
     }
+    // Not handling numbers separately because Rhino has some peculiar ways of dealing with numbers
     try {
       return new JsonParser(cx, scope).parseValue(objectMapper.writeValueAsString(jsonNode));
     } catch (JsonParser.ParseException | IOException e) {
