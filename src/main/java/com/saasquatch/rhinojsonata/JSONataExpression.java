@@ -5,7 +5,6 @@ import static com.saasquatch.rhinojsonata.JunkDrawer.EVALUATE;
 import static com.saasquatch.rhinojsonata.JunkDrawer.REGISTER_FUNCTION;
 import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -103,17 +102,6 @@ public final class JSONataExpression {
       assign(name, objectMapper.writeValueAsString(jsonNode));
     } catch (IOException e) {
       throw new JSONataException(e.getMessage(), e);
-    }
-  }
-
-  public void assignJavaObject(@Nonnull String name, @Nonnull Object javaObject) {
-    Objects.requireNonNull(name);
-    Objects.requireNonNull(javaObject);
-    try {
-      ScriptableObject.callMethod(expressionNativeObject, ASSIGN,
-          new Object[]{name, Context.javaToJS(javaObject, scope)});
-    } catch (RhinoException e) {
-      rethrowRhinoException(cx, scope, e);
     }
   }
 
