@@ -43,7 +43,8 @@ public final class JSONata {
   Function getTimeboxExpressionFunction() {
     Function f = timeboxFunction;
     if (f == null) {
-      timeboxFunction = f = cx.compileFunction(scope, TIMEBOX_EXPRESSION_JS, null, 1, null);
+      timeboxFunction = f = (Function) cx.evaluateString(
+          scope, TIMEBOX_EXPRESSION_JS, null, 1, null);
     }
     return f;
   }

@@ -23,7 +23,7 @@ final class JunkDrawer {
    * It is licenced under MIT License
    */
   public static final String TIMEBOX_EXPRESSION_JS = ""
-      + "function timeboxExpression(expr, timeout, maxDepth) {\n"
+      + "(expr, timeout, maxDepth) => {\n"
       + "    var depth = 0;\n"
       + "    var time = Date.now();\n"
       + "\n"
