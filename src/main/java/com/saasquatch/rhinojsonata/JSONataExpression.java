@@ -15,6 +15,7 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.NativeJSON;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
@@ -65,8 +66,12 @@ public final class JSONataExpression {
       return JsonNodeFactory.instance.missingNode();
     }
     try {
-      return objectMapper.valueToTree(evaluateResult);
-    } catch (IllegalArgumentException e) {
+      final String evaluationResultStringify = NativeJSON.stringify(
+          cx, scope, evaluateResult, null, null).toString();
+      return objectMapper.readTree(evaluationResultStringify);
+    } catch (RhinoException e) {
+      return rethrowRhinoException(cx, scope, e);
+    } catch (IOException e) {
       throw new JSONataException(e.getMessage(), e);
     }
   }

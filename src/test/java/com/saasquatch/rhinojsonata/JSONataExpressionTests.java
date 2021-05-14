@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.nio.ByteBuffer;
 import java.time.Duration;
-import java.util.function.UnaryOperator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -82,7 +81,7 @@ public class JSONataExpressionTests {
     {
       final JSONataExpression expression = jsonata.parse("$foo");
       expression.assignJsExpression("foo", "1");
-      assertEquals(JsonNodeFactory.instance.numberNode(1.0), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.numberNode(1), expression.evaluate(null));
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo");
@@ -97,7 +96,7 @@ public class JSONataExpressionTests {
     {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
       expression.assignJsExpression("foo", "a => a + a");
-      assertEquals(JsonNodeFactory.instance.numberNode(2.0), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.numberNode(2), expression.evaluate(null));
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo('1')");
@@ -127,11 +126,6 @@ public class JSONataExpressionTests {
       expression.assignJavaObject("foo", ByteBuffer.allocate(1));
       assertThrows(JSONataException.class, () -> expression.evaluate(null));
     }
-    {
-      final JSONataExpression expression = jsonata.parse("$foo");
-      expression.assignJavaObject("foo", (UnaryOperator<String>) s -> s + s);
-      assertThrows(JSONataException.class, () -> expression.evaluate(null));
-    }
   }
 
   @Test
@@ -139,12 +133,12 @@ public class JSONataExpressionTests {
     {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
       expression.registerJsFunction("foo", "function(a) {return a + a}", "<n:n>");
-      assertEquals(JsonNodeFactory.instance.numberNode(2.0), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.numberNode(2), expression.evaluate(null));
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
       expression.registerJsFunction("foo", "function(a) {return a + a}", null);
-      assertEquals(JsonNodeFactory.instance.numberNode(2.0), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.numberNode(2), expression.evaluate(null));
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
@@ -158,12 +152,12 @@ public class JSONataExpressionTests {
     {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
       expression.registerJsArrowFunction("foo", "a => a + a", "<n:n>");
-      assertEquals(JsonNodeFactory.instance.numberNode(2.0), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.numberNode(2), expression.evaluate(null));
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
       expression.registerJsArrowFunction("foo", "a => a + a", null);
-      assertEquals(JsonNodeFactory.instance.numberNode(2.0), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.numberNode(2), expression.evaluate(null));
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
