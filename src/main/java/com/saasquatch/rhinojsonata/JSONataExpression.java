@@ -126,7 +126,7 @@ public final class JSONataExpression {
       throw new IllegalArgumentException("maxDepth has to be positive");
     }
     jsonata.getTimeboxExpressionFunction().call(cx, scope, scope,
-        new Object[]{expressionNativeObject, (int) timeout.toMillis(), maxDepth});
+        new Object[]{expressionNativeObject, timeoutMillis, maxDepth});
   }
 
 }
