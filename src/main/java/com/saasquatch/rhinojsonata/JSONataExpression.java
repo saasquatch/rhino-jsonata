@@ -13,7 +13,6 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.mozilla.javascript.Context;
@@ -118,8 +117,14 @@ public final class JSONataExpression {
     }
   }
 
-  public void timeboxExpression(@Nonnull Duration timeout, @Nonnegative int maxDepth) {
-    Objects.requireNonNull(timeout);
+  public void timeboxExpression(@Nonnull Duration timeout, int maxDepth) {
+    final int timeoutMillis = (int) timeout.toMillis();
+    if (timeoutMillis <= 0) {
+      throw new IllegalArgumentException("timeout has to be positive");
+    }
+    if (maxDepth <= 0) {
+      throw new IllegalArgumentException("maxDepth has to be positive");
+    }
     jsonata.getTimeboxExpressionFunction().call(cx, scope, scope,
         new Object[]{expressionNativeObject, (int) timeout.toMillis(), maxDepth});
   }
