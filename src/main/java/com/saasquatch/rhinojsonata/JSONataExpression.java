@@ -120,6 +120,7 @@ public final class JSONataExpression {
   }
 
   public void timeboxExpression(@Nonnull Duration timeout, @Nonnegative int maxDepth) {
+    Objects.requireNonNull(timeout);
     jsonata.getTimeboxExpressionFunction().call(cx, scope, scope,
         new Object[]{expressionNativeObject, (int) timeout.toMillis(), maxDepth});
   }
