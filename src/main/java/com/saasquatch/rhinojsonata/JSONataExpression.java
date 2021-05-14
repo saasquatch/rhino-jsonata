@@ -5,6 +5,7 @@ import static com.saasquatch.rhinojsonata.JunkDrawer.EVALUATE;
 import static com.saasquatch.rhinojsonata.JunkDrawer.REGISTER_FUNCTION;
 import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -84,7 +85,7 @@ public final class JSONataExpression {
     }
   }
 
-  public void assignJsExpression(@Nonnull String name, @Nonnull String jsExpression) {
+  public void assign(@Nonnull String name, @Nonnull String jsExpression) {
     Objects.requireNonNull(name);
     Objects.requireNonNull(jsExpression);
     try {
@@ -92,6 +93,16 @@ public final class JSONataExpression {
           new Object[]{name, cx.evaluateString(scope, jsExpression, null, 1, null)});
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
+    }
+  }
+
+  public void assign(@Nonnull String name, @Nonnull JsonNode jsonNode) {
+    Objects.requireNonNull(name);
+    Objects.requireNonNull(jsonNode);
+    try {
+      assign(name, objectMapper.writeValueAsString(jsonNode));
+    } catch (IOException e) {
+      throw new JSONataException(e.getMessage(), e);
     }
   }
 
@@ -106,7 +117,7 @@ public final class JSONataExpression {
     }
   }
 
-  public void registerJsFunction(@Nonnull String name, @Nonnull String jsFunctionExpression,
+  public void registerFunction(@Nonnull String name, @Nonnull String jsFunctionExpression,
       @Nullable String signature) {
     Objects.requireNonNull(name);
     Objects.requireNonNull(jsFunctionExpression);

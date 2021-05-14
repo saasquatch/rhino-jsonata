@@ -27,7 +27,7 @@ public class JSONataTests {
   public void testJavaClassesInaccessible() {
     final JSONata jsonata = JSONata.create();
     final JSONataExpression expression = jsonata.parse("$foo()");
-    expression.assignJsExpression("foo", "() => { java.lang.System.out.println(\"HELLO\"); }");
+    expression.assign("foo", "() => { java.lang.System.out.println(\"HELLO\"); }");
     try {
       expression.evaluate();
       fail();
