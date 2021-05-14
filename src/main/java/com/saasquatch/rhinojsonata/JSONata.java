@@ -1,5 +1,6 @@
 package com.saasquatch.rhinojsonata;
 
+import static com.saasquatch.rhinojsonata.JunkDrawer.JSONATA;
 import static com.saasquatch.rhinojsonata.JunkDrawer.TIMEBOX_EXPRESSION_JS;
 import static com.saasquatch.rhinojsonata.JunkDrawer.getDefaultJSONataSource;
 import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
@@ -33,7 +34,7 @@ public final class JSONata {
     Objects.requireNonNull(expression);
     try {
       final NativeObject expressionNativeObject = (NativeObject) ScriptableObject.callMethod(
-          scope, "jsonata", new Object[]{expression});
+          scope, JSONATA, new Object[]{expression});
       return new JSONataExpression(this, expressionNativeObject);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
