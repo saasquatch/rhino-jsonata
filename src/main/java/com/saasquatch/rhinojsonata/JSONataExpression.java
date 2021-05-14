@@ -3,6 +3,7 @@ package com.saasquatch.rhinojsonata;
 import static com.saasquatch.rhinojsonata.JunkDrawer.ASSIGN;
 import static com.saasquatch.rhinojsonata.JunkDrawer.EVALUATE;
 import static com.saasquatch.rhinojsonata.JunkDrawer.REGISTER_FUNCTION;
+import static com.saasquatch.rhinojsonata.JunkDrawer.jsonNodeToJs;
 import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -22,7 +23,6 @@ import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
-import org.mozilla.javascript.json.JsonParser;
 
 public final class JSONataExpression {
 
@@ -48,26 +48,15 @@ public final class JSONataExpression {
   public JsonNode evaluate(@Nullable JsonNode input) {
     final Object evaluateResult;
     try {
-      final Object inputNativeObject;
-      if (input == null || input.isNull()) {
-        inputNativeObject = null;
-      } else if (input.isMissingNode()) {
-        inputNativeObject = Undefined.instance;
-      } else {
-        final String inputStringify = objectMapper.writeValueAsString(input);
-        inputNativeObject = new JsonParser(cx, scope).parseValue(inputStringify);
-      }
       evaluateLock.lock();
       try {
         evaluateResult = ScriptableObject.callMethod(expressionNativeObject, EVALUATE,
-            new Object[]{inputNativeObject});
+            new Object[]{jsonNodeToJs(cx, scope, objectMapper, input)});
       } finally {
         evaluateLock.unlock();
       }
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
-    } catch (JsonParser.ParseException | IOException e) {
-      throw new JSONataException(e.getMessage(), e);
     }
     if (evaluateResult instanceof Undefined) {
       return JsonNodeFactory.instance.missingNode();
@@ -87,8 +76,7 @@ public final class JSONataExpression {
     Objects.requireNonNull(name);
     Objects.requireNonNull(jsExpression);
     try {
-      ScriptableObject.callMethod(expressionNativeObject, ASSIGN,
-          new Object[]{name, cx.evaluateString(scope, jsExpression, null, 1, null)});
+      _assign(name, cx.evaluateString(scope, jsExpression, null, 1, null));
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
     }
@@ -98,10 +86,14 @@ public final class JSONataExpression {
     Objects.requireNonNull(name);
     Objects.requireNonNull(jsonNode);
     try {
-      assign(name, objectMapper.writeValueAsString(jsonNode));
-    } catch (IOException e) {
-      throw new JSONataException(e.getMessage(), e);
+      _assign(name, jsonNodeToJs(cx, scope, objectMapper, jsonNode));
+    } catch (RhinoException e) {
+      rethrowRhinoException(cx, scope, e);
     }
+  }
+
+  private void _assign(@Nonnull String name, Object nativeObject) {
+    ScriptableObject.callMethod(expressionNativeObject, ASSIGN, new Object[]{name, nativeObject});
   }
 
   public void registerFunction(@Nonnull String name, @Nonnull String jsFunctionExpression,

@@ -2,16 +2,21 @@ package com.saasquatch.rhinojsonata;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.NativeJSON;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.Undefined;
+import org.mozilla.javascript.json.JsonParser;
 
 final class JunkDrawer {
 
@@ -79,6 +84,20 @@ final class JunkDrawer {
       }
       throw new JSONataException(message, e);
     } else {
+      throw new JSONataException(e.getMessage(), e);
+    }
+  }
+
+  public static Object jsonNodeToJs(Context cx, Scriptable scope, ObjectMapper objectMapper,
+      @Nullable JsonNode jsonNode) {
+    if (jsonNode == null || jsonNode.isNull()) {
+      return null;
+    } else if (jsonNode.isMissingNode()) {
+      return Undefined.instance;
+    }
+    try {
+      return new JsonParser(cx, scope).parseValue(objectMapper.writeValueAsString(jsonNode));
+    } catch (JsonParser.ParseException | IOException e) {
       throw new JSONataException(e.getMessage(), e);
     }
   }

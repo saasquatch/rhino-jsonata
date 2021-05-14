@@ -120,6 +120,16 @@ public class JSONataExpressionTests {
       expression.assign("foo", JsonNodeFactory.instance.textNode("1"));
       assertEquals(JsonNodeFactory.instance.textNode("1"), expression.evaluate(null));
     }
+    {
+      final JSONataExpression expression = jsonata.parse("$foo");
+      expression.assign("foo", JsonNodeFactory.instance.nullNode());
+      assertEquals(JsonNodeFactory.instance.nullNode(), expression.evaluate(null));
+    }
+    {
+      final JSONataExpression expression = jsonata.parse("$foo");
+      expression.assign("foo", JsonNodeFactory.instance.missingNode());
+      assertEquals(JsonNodeFactory.instance.missingNode(), expression.evaluate(null));
+    }
   }
 
   @Test
