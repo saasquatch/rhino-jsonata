@@ -48,10 +48,11 @@ public final class JSONataExpression {
   public JsonNode evaluate(@Nullable JsonNode input) {
     final Object evaluateResult;
     try {
+      final Object jsObject = jsonNodeToJs(cx, scope, objectMapper, input);
       evaluateLock.lock();
       try {
         evaluateResult = ScriptableObject.callMethod(expressionNativeObject, EVALUATE,
-            new Object[]{jsonNodeToJs(cx, scope, objectMapper, input)});
+            new Object[]{jsObject});
       } finally {
         evaluateLock.unlock();
       }
@@ -92,8 +93,8 @@ public final class JSONataExpression {
     }
   }
 
-  private void _assign(@Nonnull String name, Object nativeObject) {
-    ScriptableObject.callMethod(expressionNativeObject, ASSIGN, new Object[]{name, nativeObject});
+  private void _assign(@Nonnull String name, Object jsObject) {
+    ScriptableObject.callMethod(expressionNativeObject, ASSIGN, new Object[]{name, jsObject});
   }
 
   public void registerFunction(@Nonnull String name, @Nonnull String jsFunctionExpression,
