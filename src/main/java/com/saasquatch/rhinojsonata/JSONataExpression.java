@@ -46,8 +46,8 @@ public final class JSONataExpression {
   }
 
   public JsonNode evaluate(@Nullable JsonNode input) {
-    final Object evaluateResult;
     try {
+      final Object evaluateResult;
       final Object jsObject = jsonNodeToJs(cx, scope, objectMapper, input);
       evaluateLock.lock();
       try {
@@ -56,13 +56,9 @@ public final class JSONataExpression {
       } finally {
         evaluateLock.unlock();
       }
-    } catch (RhinoException e) {
-      return rethrowRhinoException(cx, scope, e);
-    }
-    if (evaluateResult instanceof Undefined) {
-      return JsonNodeFactory.instance.missingNode();
-    }
-    try {
+      if (evaluateResult instanceof Undefined) {
+        return JsonNodeFactory.instance.missingNode();
+      }
       final String evaluationResultStringify = NativeJSON.stringify(
           cx, scope, evaluateResult, null, null).toString();
       return objectMapper.readTree(evaluationResultStringify);
