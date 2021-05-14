@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
