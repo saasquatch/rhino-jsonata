@@ -104,20 +104,7 @@ public final class JSONataExpression {
     Objects.requireNonNull(jsFunctionExpression);
     try {
       ScriptableObject.callMethod(expressionNativeObject, REGISTER_FUNCTION,
-          new Object[]{name, cx.compileFunction(scope, jsFunctionExpression, null, 1, null),
-              signature == null ? Undefined.instance : signature});
-    } catch (RhinoException e) {
-      rethrowRhinoException(cx, scope, e);
-    }
-  }
-
-  public void registerJsArrowFunction(@Nonnull String name, @Nonnull String jsLambdaExpression,
-      @Nullable String signature) {
-    Objects.requireNonNull(name);
-    Objects.requireNonNull(jsLambdaExpression);
-    try {
-      ScriptableObject.callMethod(expressionNativeObject, REGISTER_FUNCTION,
-          new Object[]{name, cx.evaluateString(scope, jsLambdaExpression, null, 1, null),
+          new Object[]{name, cx.evaluateString(scope, jsFunctionExpression, null, 1, null),
               signature == null ? Undefined.instance : signature});
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
