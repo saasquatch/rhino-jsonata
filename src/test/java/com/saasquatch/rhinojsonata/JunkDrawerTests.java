@@ -100,7 +100,7 @@ public class JunkDrawerTests {
   }
 
   @Test
-  public void testLoadJSONataSourceCaching() {
+  public void testLoadJSONataSourceLazyInit() {
     assertSame(getDefaultJSONataSource(), getDefaultJSONataSource());
   }
 
