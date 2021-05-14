@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Objects;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -45,7 +46,7 @@ public final class JSONataExpression {
     final Object evaluateResult;
     try {
       final Object inputNativeObject;
-      if (input == null) {
+      if (input == null || input.isNull()) {
         inputNativeObject = null;
       } else if (input.isMissingNode()) {
         inputNativeObject = Undefined.instance;
@@ -71,6 +72,8 @@ public final class JSONataExpression {
   }
 
   public void assignJsExpression(@Nonnull String name, @Nonnull String jsExpression) {
+    Objects.requireNonNull(name);
+    Objects.requireNonNull(jsExpression);
     try {
       ScriptableObject.callMethod(expressionNativeObject, ASSIGN,
           new Object[]{name, cx.evaluateString(scope, jsExpression, null, 1, null)});
@@ -80,6 +83,8 @@ public final class JSONataExpression {
   }
 
   public void assignJavaObject(@Nonnull String name, @Nonnull Object javaObject) {
+    Objects.requireNonNull(name);
+    Objects.requireNonNull(javaObject);
     try {
       ScriptableObject.callMethod(expressionNativeObject, ASSIGN,
           new Object[]{name, Context.javaToJS(javaObject, scope)});
@@ -90,6 +95,8 @@ public final class JSONataExpression {
 
   public void registerJsFunction(@Nonnull String name, @Nonnull String jsFunctionExpression,
       @Nullable String signature) {
+    Objects.requireNonNull(name);
+    Objects.requireNonNull(jsFunctionExpression);
     try {
       ScriptableObject.callMethod(expressionNativeObject, REGISTER_FUNCTION,
           new Object[]{name, cx.compileFunction(scope, jsFunctionExpression, null, 1, null),
@@ -101,6 +108,8 @@ public final class JSONataExpression {
 
   public void registerJsArrowFunction(@Nonnull String name, @Nonnull String jsLambdaExpression,
       @Nullable String signature) {
+    Objects.requireNonNull(name);
+    Objects.requireNonNull(jsLambdaExpression);
     try {
       ScriptableObject.callMethod(expressionNativeObject, REGISTER_FUNCTION,
           new Object[]{name, cx.evaluateString(scope, jsLambdaExpression, null, 1, null),
