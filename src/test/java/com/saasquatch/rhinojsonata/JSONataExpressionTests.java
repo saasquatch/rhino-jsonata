@@ -199,6 +199,7 @@ public class JSONataExpressionTests {
   public void testTimeboxMaxDepth() {
     final JSONataExpression expression = jsonata.parse(
         "($f1 := function($x) { $f1($x) + $f1($x) }; $f1(1))");
+    assertThrows(StackOverflowError.class, expression::evaluate);
     expression.timeboxExpression(Duration.ofDays(1), 10);
     try {
       expression.evaluate();
