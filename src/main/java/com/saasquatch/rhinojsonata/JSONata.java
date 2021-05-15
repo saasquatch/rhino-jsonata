@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.RhinoException;
@@ -31,10 +32,13 @@ public final class JSONata {
   // Lazy init
   private Function timeboxFunction;
   final Scriptable scope;
+  final ContextFactory contextFactory;
   final ObjectMapper objectMapper;
 
-  private JSONata(@Nonnull Scriptable scope, @Nonnull ObjectMapper objectMapper) {
+  private JSONata(@Nonnull Scriptable scope, @Nonnull ContextFactory contextFactory,
+      @Nonnull ObjectMapper objectMapper) {
     this.scope = scope;
+    this.contextFactory = contextFactory;
     this.objectMapper = objectMapper;
   }
 
@@ -44,7 +48,7 @@ public final class JSONata {
    */
   public JSONataExpression parse(@Nonnull String expression) {
     Objects.requireNonNull(expression);
-    final Context cx = Context.enter();
+    final Context cx = contextFactory.enterContext();
     try {
       final NativeObject expressionNativeObject = (NativeObject) ScriptableObject.callMethod(
           scope, JSONATA, new Object[]{expression});
@@ -59,7 +63,7 @@ public final class JSONata {
   Function getTimeboxExpressionFunction() {
     Function f = timeboxFunction;
     if (f == null) {
-      final Context cx = Context.enter();
+      final Context cx = contextFactory.enterContext();
       try {
         timeboxFunction = f = (Function) cx.evaluateString(
             scope, TIMEBOX_EXPRESSION_JS, null, 1, null);
@@ -81,13 +85,16 @@ public final class JSONata {
    * @return An instance of {@link JSONata} with the given custom options.
    */
   public static JSONata create(@Nonnull JSONataOptions options) {
+    // Avoid using the global ContextFactory
+    final ContextFactory contextFactory =
+        options.contextFactory == null ? new ContextFactory() : options.contextFactory;
     final String jsonataJsString =
         options.jsonataJsSource == null ? getDefaultJSONataSource() : options.jsonataJsSource;
-    final Scriptable scope = createScope();
-    final Context cx = Context.enter();
+    final Scriptable scope = createScope(contextFactory);
+    final Context cx = contextFactory.enterContext();
     try {
       cx.evaluateString(scope, jsonataJsString, null, 1, null);
-      return new JSONata(scope,
+      return new JSONata(scope, contextFactory,
           options.objectMapper == null ? new ObjectMapper() : options.objectMapper);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
@@ -96,8 +103,8 @@ public final class JSONata {
     }
   }
 
-  private static Scriptable createScope() {
-    final Context cx = Context.enter();
+  private static Scriptable createScope(ContextFactory contextFactory) {
+    final Context cx = contextFactory.enterContext();
     try {
       return cx.initSafeStandardObjects();
     } finally {

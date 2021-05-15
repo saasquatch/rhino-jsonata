@@ -17,6 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.NativeJSON;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.RhinoException;
@@ -34,12 +35,14 @@ import org.mozilla.javascript.Undefined;
 public final class JSONataExpression {
 
   private final Lock evaluateLock = new ReentrantLock();
+  private final ContextFactory contextFactory;
   private final Scriptable scope;
   private final ObjectMapper objectMapper;
   private final JSONata jsonata;
   private final NativeObject expressionNativeObject;
 
   JSONataExpression(@Nonnull JSONata jsonata, @Nonnull NativeObject expressionNativeObject) {
+    this.contextFactory = jsonata.contextFactory;
     this.scope = jsonata.scope;
     this.objectMapper = jsonata.objectMapper;
     this.jsonata = jsonata;
@@ -57,7 +60,7 @@ public final class JSONataExpression {
    * Evaluate the compiled JSONata expression with the given input.
    */
   public JsonNode evaluate(@Nullable JsonNode input) {
-    final Context cx = Context.enter();
+    final Context cx = contextFactory.enterContext();
     try {
       final Object evaluateResult;
       final Object jsObject = jsonNodeToJs(cx, scope, objectMapper, input);
@@ -94,7 +97,7 @@ public final class JSONataExpression {
   public void assign(@Nonnull String name, @Nonnull String jsExpression) {
     Objects.requireNonNull(name);
     Objects.requireNonNull(jsExpression);
-    final Context cx = Context.enter();
+    final Context cx = contextFactory.enterContext();
     try {
       _assign(name, cx.evaluateString(scope, jsExpression, null, 1, null));
     } catch (RhinoException e) {
@@ -109,7 +112,7 @@ public final class JSONataExpression {
    */
   public void assign(@Nonnull String name, @Nullable JsonNode jsonNode) {
     Objects.requireNonNull(name);
-    final Context cx = Context.enter();
+    final Context cx = contextFactory.enterContext();
     try {
       _assign(name, jsonNodeToJs(cx, scope, objectMapper, jsonNode));
     } catch (RhinoException e) {
@@ -137,7 +140,7 @@ public final class JSONataExpression {
       @Nullable String signature) {
     Objects.requireNonNull(name);
     Objects.requireNonNull(jsFunctionExpression);
-    final Context cx = Context.enter();
+    final Context cx = contextFactory.enterContext();
     try {
       ScriptableObject.callMethod(expressionNativeObject, REGISTER_FUNCTION,
           new Object[]{name, cx.evaluateString(scope, jsFunctionExpression, null, 1, null),
@@ -157,7 +160,7 @@ public final class JSONataExpression {
     if (maxDepth <= 0) {
       throw new IllegalArgumentException("maxDepth has to be positive");
     }
-    final Context cx = Context.enter();
+    final Context cx = contextFactory.enterContext();
     try {
       jsonata.getTimeboxExpressionFunction().call(cx, scope, scope,
           new Object[]{expressionNativeObject, timeoutMillis, maxDepth});
