@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeAll;
@@ -89,6 +90,16 @@ public class JSONataExpressionTests {
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo");
+      expression.assign("foo", "null");
+      assertEquals(JsonNodeFactory.instance.nullNode(), expression.evaluate(null));
+    }
+    {
+      final JSONataExpression expression = jsonata.parse("$foo");
+      expression.assign("foo", "undefined");
+      assertEquals(JsonNodeFactory.instance.missingNode(), expression.evaluate(null));
+    }
+    {
+      final JSONataExpression expression = jsonata.parse("$foo");
       expression.assign("foo", "a => a + a");
       assertThrows(JSONataException.class, () -> expression.evaluate(null));
     }
@@ -123,6 +134,11 @@ public class JSONataExpressionTests {
     {
       final JSONataExpression expression = jsonata.parse("$foo");
       expression.assign("foo", JsonNodeFactory.instance.nullNode());
+      assertEquals(JsonNodeFactory.instance.nullNode(), expression.evaluate(null));
+    }
+    {
+      final JSONataExpression expression = jsonata.parse("$foo");
+      expression.assign("foo", (JsonNode) null);
       assertEquals(JsonNodeFactory.instance.nullNode(), expression.evaluate(null));
     }
     {
