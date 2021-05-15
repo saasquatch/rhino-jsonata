@@ -48,10 +48,16 @@ public final class JSONataExpression {
     this.expressionNativeObject = expressionNativeObject;
   }
 
+  /**
+   * Evaluate the compiled JSONata expression without an input.
+   */
   public JsonNode evaluate() {
     return evaluate(JsonNodeFactory.instance.missingNode());
   }
 
+  /**
+   * Evaluate the compiled JSONata expression with the given input.
+   */
   public JsonNode evaluate(@Nullable JsonNode input) {
     try {
       final Object evaluateResult;
@@ -86,9 +92,8 @@ public final class JSONataExpression {
     }
   }
 
-  public void assign(@Nonnull String name, @Nonnull JsonNode jsonNode) {
+  public void assign(@Nonnull String name, @Nullable JsonNode jsonNode) {
     Objects.requireNonNull(name);
-    Objects.requireNonNull(jsonNode);
     try {
       _assign(name, jsonNodeToJs(cx, scope, objectMapper, jsonNode));
     } catch (RhinoException e) {
