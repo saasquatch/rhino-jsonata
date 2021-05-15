@@ -24,6 +24,13 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
+/**
+ * A compiled JSONata expression. This class is equivalent to the result of calling {@code
+ * jsonata("jsonata expression")} in jsonata-js.
+ *
+ * @author sli
+ * @see JSONata#parse(String)
+ */
 public final class JSONataExpression {
 
   private final Lock evaluateLock = new ReentrantLock();
