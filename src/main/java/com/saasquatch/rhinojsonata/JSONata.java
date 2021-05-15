@@ -15,6 +15,13 @@ import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
+/**
+ * This class represents a JSONata runtime.<br>Calling {@link JSONata#create()} is equivalent to
+ * calling {@code require("jsonata")} in jsonata-js.
+ *
+ * @author sli
+ * @see #create()
+ */
 public final class JSONata {
 
   // Lazy init
@@ -30,6 +37,10 @@ public final class JSONata {
     this.objectMapper = objectMapper;
   }
 
+  /**
+   * Parse the given JSONata expression.<br>
+   * This method is equivalent to calling {@code jsonata("jsonata expression")} in jsonata-js.
+   */
   public JSONataExpression parse(@Nonnull String expression) {
     Objects.requireNonNull(expression);
     try {
@@ -50,10 +61,16 @@ public final class JSONata {
     return f;
   }
 
+  /**
+   * @return An instance of {@link JSONata} with default options.
+   */
   public static JSONata create() {
     return create(JSONataOptions.newBuilder().build());
   }
 
+  /**
+   * @return An instance of {@link JSONata} with the given custom options.
+   */
   public static JSONata create(@Nonnull JSONataOptions options) {
     final String jsonataJsString =
         options.jsonataJsSource == null ? getDefaultJSONataSource() : options.jsonataJsSource;
