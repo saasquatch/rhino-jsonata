@@ -72,9 +72,8 @@ public final class JSONataExpression {
       if (evaluateResult instanceof Undefined) {
         return JsonNodeFactory.instance.missingNode();
       }
-      final String evaluationResultStringify = NativeJSON.stringify(
-          cx, scope, evaluateResult, null, null).toString();
-      return objectMapper.readTree(evaluationResultStringify);
+      return objectMapper.readTree(NativeJSON.stringify(
+          cx, scope, evaluateResult, null, null).toString());
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
     } catch (IOException e) {
@@ -101,7 +100,7 @@ public final class JSONataExpression {
     }
   }
 
-  private void _assign(@Nonnull String name, Object jsObject) {
+  private void _assign(@Nonnull String name, @Nullable Object jsObject) {
     ScriptableObject.callMethod(expressionNativeObject, ASSIGN, new Object[]{name, jsObject});
   }
 
