@@ -1,7 +1,7 @@
 package com.saasquatch.rhinojsonata;
 
 import static com.saasquatch.rhinojsonata.JunkDrawer.getDefaultJSONataSource;
-import static com.saasquatch.rhinojsonata.JunkDrawer.readerToString;
+import static com.saasquatch.rhinojsonata.JunkDrawer.readToString;
 import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
@@ -80,11 +79,10 @@ public class JunkDrawerTests {
   }
 
   @Test
-  public void testReaderToString() throws Exception {
+  public void testReadToString() throws Exception {
     final byte[] bytes = new byte[100_000];
     ThreadLocalRandom.current().nextBytes(bytes);
-    final String readerToString = readerToString(
-        new InputStreamReader(new ByteArrayInputStream(bytes), UTF_8), 1024);
+    final String readerToString = readToString(new ByteArrayInputStream(bytes), UTF_8);
     assertEquals(new String(bytes, UTF_8), readerToString);
   }
 

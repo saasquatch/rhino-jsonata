@@ -4,12 +4,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.WillNotClose;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.NativeJSON;
@@ -115,25 +117,22 @@ final class JunkDrawer {
     }
   }
 
-  public static String readerToString(Reader reader, int bufferSize) throws IOException {
-    final char[] buf = new char[bufferSize];
-    final StringBuilder sb = new StringBuilder(bufferSize);
-    int numCharsRead;
-    while ((numCharsRead = reader.read(buf, 0, buf.length)) != -1) {
-      sb.append(buf, 0, numCharsRead);
+  public static String readToString(@Nonnull @WillNotClose InputStream inputStream,
+      @Nonnull Charset charset) throws IOException {
+    final ByteArrayOutputStream result = new ByteArrayOutputStream();
+    final byte[] buffer = new byte[8192];
+    int bytesRead;
+    while ((bytesRead = inputStream.read(buffer)) != -1) {
+      result.write(buffer, 0, bytesRead);
     }
-    return sb.toString();
+    return result.toString(charset.name());
   }
 
   public static String getDefaultJSONataSource() {
-    try (
-        InputStream jsonataSourceStream = JSONataExpression.class.getResourceAsStream(
-            "/saasquatch-jsonata-es5.min.js");
-        Reader jsonataSourceReader = new InputStreamReader(
-            Objects.requireNonNull(jsonataSourceStream), UTF_8)
-    ) {
+    try (InputStream jsonataSourceStream = JSONataExpression.class.getResourceAsStream(
+        "/saasquatch-jsonata-es5.min.js")) {
       // The source for jsonata-es5.min.js is just over 100 KB
-      return readerToString(jsonataSourceReader, 150_000);
+      return readToString(Objects.requireNonNull(jsonataSourceStream), UTF_8);
     } catch (IOException e) {
       throw new JSONataException(e.getMessage(), e);
     }
