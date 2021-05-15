@@ -90,14 +90,20 @@ final class JunkDrawer {
 
   public static Object jsonNodeToJs(Context cx, Scriptable scope, ObjectMapper objectMapper,
       @Nullable JsonNode jsonNode) {
-    if (jsonNode == null || jsonNode.isNull()) {
+    if (jsonNode == null) {
       return null;
-    } else if (jsonNode.isMissingNode()) {
-      return Undefined.instance;
-    } else if (jsonNode.isBoolean()) {
-      return jsonNode.booleanValue();
-    } else if (jsonNode.isTextual()) {
-      return jsonNode.textValue();
+    }
+    switch (jsonNode.getNodeType()) {
+      case NULL:
+        return null;
+      case MISSING:
+        return Undefined.instance;
+      case BOOLEAN:
+        return jsonNode.booleanValue();
+      case STRING:
+        return jsonNode.textValue();
+      default:
+        break;
     }
     // Not handling numbers separately because Rhino has some peculiar ways of dealing with numbers
     try {
