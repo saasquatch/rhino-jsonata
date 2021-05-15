@@ -18,6 +18,11 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Undefined;
 import org.mozilla.javascript.json.JsonParser;
 
+/**
+ * Internal utils
+ *
+ * @author sli
+ */
 final class JunkDrawer {
 
   public static final String JSONATA = "jsonata", EVALUATE = "evaluate", ASSIGN = "assign",
