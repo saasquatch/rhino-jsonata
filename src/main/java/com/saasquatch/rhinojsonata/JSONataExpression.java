@@ -34,14 +34,12 @@ import org.mozilla.javascript.Undefined;
 public final class JSONataExpression {
 
   private final Lock evaluateLock = new ReentrantLock();
-  private final Context cx;
   private final Scriptable scope;
   private final ObjectMapper objectMapper;
   private final JSONata jsonata;
   private final NativeObject expressionNativeObject;
 
   JSONataExpression(@Nonnull JSONata jsonata, @Nonnull NativeObject expressionNativeObject) {
-    this.cx = jsonata.cx;
     this.scope = jsonata.scope;
     this.objectMapper = jsonata.objectMapper;
     this.jsonata = jsonata;
@@ -59,6 +57,7 @@ public final class JSONataExpression {
    * Evaluate the compiled JSONata expression with the given input.
    */
   public JsonNode evaluate(@Nullable JsonNode input) {
+    final Context cx = Context.enter();
     try {
       final Object evaluateResult;
       final Object jsObject = jsonNodeToJs(cx, scope, objectMapper, input);
@@ -78,6 +77,8 @@ public final class JSONataExpression {
       return rethrowRhinoException(cx, scope, e);
     } catch (IOException e) {
       throw new JSONataException(e.getMessage(), e);
+    } finally {
+      Context.exit();
     }
   }
 
@@ -93,10 +94,13 @@ public final class JSONataExpression {
   public void assign(@Nonnull String name, @Nonnull String jsExpression) {
     Objects.requireNonNull(name);
     Objects.requireNonNull(jsExpression);
+    final Context cx = Context.enter();
     try {
       _assign(name, cx.evaluateString(scope, jsExpression, null, 1, null));
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
+    } finally {
+      Context.exit();
     }
   }
 
@@ -105,10 +109,13 @@ public final class JSONataExpression {
    */
   public void assign(@Nonnull String name, @Nullable JsonNode jsonNode) {
     Objects.requireNonNull(name);
+    final Context cx = Context.enter();
     try {
       _assign(name, jsonNodeToJs(cx, scope, objectMapper, jsonNode));
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
+    } finally {
+      Context.exit();
     }
   }
 
@@ -130,12 +137,15 @@ public final class JSONataExpression {
       @Nullable String signature) {
     Objects.requireNonNull(name);
     Objects.requireNonNull(jsFunctionExpression);
+    final Context cx = Context.enter();
     try {
       ScriptableObject.callMethod(expressionNativeObject, REGISTER_FUNCTION,
           new Object[]{name, cx.evaluateString(scope, jsFunctionExpression, null, 1, null),
               signature == null ? Undefined.instance : signature});
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
+    } finally {
+      Context.exit();
     }
   }
 
@@ -147,11 +157,14 @@ public final class JSONataExpression {
     if (maxDepth <= 0) {
       throw new IllegalArgumentException("maxDepth has to be positive");
     }
+    final Context cx = Context.enter();
     try {
       jsonata.getTimeboxExpressionFunction().call(cx, scope, scope,
           new Object[]{expressionNativeObject, timeoutMillis, maxDepth});
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
+    } finally {
+      Context.exit();
     }
   }
 

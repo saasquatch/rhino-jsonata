@@ -19,8 +19,8 @@ import org.mozilla.javascript.ScriptableObject;
  * This class represents a JSONata runtime.<br>Calling {@link JSONata#create()} is equivalent to
  * calling {@code require("jsonata")} in jsonata-js.<br>Creating an instanceof {@link JSONata}
  * involves multiple expensive operations, including reading the jsonata-es5.min.js source code from
- * disk and execute it, among other things. It is therefore recommended that one shared global
- * instance of {@link JSONata} should be used.
+ * disk, spinning up Rhino, executing the JS code, among other things. It is therefore recommended
+ * that one shared global instance of {@link JSONata} should be used.
  *
  * @author sli
  * @see #create()
@@ -29,13 +29,10 @@ public final class JSONata {
 
   // Lazy init
   private Function timeboxFunction;
-  final Context cx;
   final Scriptable scope;
   final ObjectMapper objectMapper;
 
-  private JSONata(@Nonnull Context cx, @Nonnull Scriptable scope,
-      @Nonnull ObjectMapper objectMapper) {
-    this.cx = cx;
+  private JSONata(@Nonnull Scriptable scope, @Nonnull ObjectMapper objectMapper) {
     this.scope = scope;
     this.objectMapper = objectMapper;
   }
@@ -46,20 +43,28 @@ public final class JSONata {
    */
   public JSONataExpression parse(@Nonnull String expression) {
     Objects.requireNonNull(expression);
+    final Context cx = Context.enter();
     try {
       final NativeObject expressionNativeObject = (NativeObject) ScriptableObject.callMethod(
           scope, JSONATA, new Object[]{expression});
       return new JSONataExpression(this, expressionNativeObject);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
+    } finally {
+      Context.exit();
     }
   }
 
   Function getTimeboxExpressionFunction() {
     Function f = timeboxFunction;
     if (f == null) {
-      timeboxFunction = f = (Function) cx.evaluateString(
-          scope, TIMEBOX_EXPRESSION_JS, null, 1, null);
+      final Context cx = Context.enter();
+      try {
+        timeboxFunction = f = (Function) cx.evaluateString(
+            scope, TIMEBOX_EXPRESSION_JS, null, 1, null);
+      } finally {
+        Context.exit();
+      }
     }
     return f;
   }
@@ -81,10 +86,12 @@ public final class JSONata {
     final Scriptable scope = cx.initSafeStandardObjects();
     try {
       cx.evaluateString(scope, jsonataJsString, null, 1, null);
-      return new JSONata(cx, scope,
+      return new JSONata(scope,
           options.objectMapper == null ? new ObjectMapper() : options.objectMapper);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
+    } finally {
+      Context.exit();
     }
   }
 
