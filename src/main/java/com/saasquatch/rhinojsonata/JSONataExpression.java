@@ -83,6 +83,12 @@ public final class JSONataExpression {
 
   /**
    * Bind a value in the form of a JavaScript expression to a name in the expression.
+   *
+   * @param jsExpression The JS expression to bind. Note that if binding a JS function is desired,
+   *                     then this parameter has the same restrictions as the {@link
+   *                     JSONataExpression#registerFunction(String, String, String)} method. See
+   *                     {@link JSONataExpression#registerFunction(String, String, String)} for more
+   *                     detail.
    */
   public void assign(@Nonnull String name, @Nonnull String jsExpression) {
     Objects.requireNonNull(name);
@@ -110,6 +116,16 @@ public final class JSONataExpression {
     ScriptableObject.callMethod(expressionNativeObject, ASSIGN, new Object[]{name, jsObject});
   }
 
+  /**
+   * Bind a JavaScript function to a name in the expression.<br>Note that the JS function string has
+   * to be a JS expression whose value is a function, which is to say that {@code "a => a"} and
+   * {@code "(function(a) {return a;})"} work, but {@code "function(a) {return a;}"} and {@code
+   * "function foo(a) {return a;}"} do not work.
+   *
+   * @param signature The JSONata function signature.
+   *                  <a href="https://docs.jsonata.org/embedding-extending#function-signature-syntax">
+   *                  Official docs</a>
+   */
   public void registerFunction(@Nonnull String name, @Nonnull String jsFunctionExpression,
       @Nullable String signature) {
     Objects.requireNonNull(name);
