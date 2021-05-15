@@ -83,14 +83,23 @@ public final class JSONata {
   public static JSONata create(@Nonnull JSONataOptions options) {
     final String jsonataJsString =
         options.jsonataJsSource == null ? getDefaultJSONataSource() : options.jsonataJsSource;
+    final Scriptable scope = createScope();
     final Context cx = Context.enter();
-    final Scriptable scope = cx.initSafeStandardObjects();
     try {
       cx.evaluateString(scope, jsonataJsString, null, 1, null);
       return new JSONata(scope,
           options.objectMapper == null ? new ObjectMapper() : options.objectMapper);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
+    } finally {
+      Context.exit();
+    }
+  }
+
+  private static Scriptable createScope() {
+    final Context cx = Context.enter();
+    try {
+      return cx.initSafeStandardObjects();
     } finally {
       Context.exit();
     }
