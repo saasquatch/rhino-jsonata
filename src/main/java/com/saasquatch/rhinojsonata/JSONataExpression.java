@@ -81,6 +81,9 @@ public final class JSONataExpression {
     }
   }
 
+  /**
+   * Bind a value in the form of a JavaScript expression to a name in the expression.
+   */
   public void assign(@Nonnull String name, @Nonnull String jsExpression) {
     Objects.requireNonNull(name);
     Objects.requireNonNull(jsExpression);
@@ -91,6 +94,9 @@ public final class JSONataExpression {
     }
   }
 
+  /**
+   * Bind a value in the form of a {@link JsonNode} to a name in the expression.
+   */
   public void assign(@Nonnull String name, @Nullable JsonNode jsonNode) {
     Objects.requireNonNull(name);
     try {
