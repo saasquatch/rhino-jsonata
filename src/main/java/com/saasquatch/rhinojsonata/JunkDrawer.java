@@ -72,7 +72,8 @@ final class JunkDrawer {
 
   private JunkDrawer() {}
 
-  public static <T> T rethrowRhinoException(Context cx, Scriptable scope, RhinoException e) {
+  public static <T> T rethrowRhinoException(@Nonnull Context cx, @Nonnull Scriptable scope,
+      @Nonnull RhinoException e) {
     if (e instanceof JavaScriptException) {
       final Object embeddedJsValue = ((JavaScriptException) e).getValue();
       final String message;
@@ -92,8 +93,8 @@ final class JunkDrawer {
     }
   }
 
-  public static Object jsonNodeToJs(Context cx, Scriptable scope, ObjectMapper objectMapper,
-      @Nullable JsonNode jsonNode) {
+  public static Object jsonNodeToJs(@Nonnull Context cx, @Nonnull Scriptable scope,
+      @Nonnull ObjectMapper objectMapper, @Nullable JsonNode jsonNode) {
     if (jsonNode == null) {
       return null;
     }
