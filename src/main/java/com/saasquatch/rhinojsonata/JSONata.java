@@ -17,13 +17,14 @@ import org.mozilla.javascript.ScriptableObject;
 
 /**
  * This class represents a JSONata runtime.<br>Calling {@link JSONata#create()} is equivalent to
- * calling {@code require("jsonata")} in jsonata-js.<br>Creating an instanceof {@link JSONata}
+ * calling {@code require("jsonata")} in jsonata-js.<br>Creating an instance of {@link JSONata}
  * involves multiple expensive operations, including reading the jsonata-es5.min.js source code from
  * disk, spinning up Rhino, executing the JS code, among other things. It is therefore recommended
  * that one shared global instance of {@link JSONata} should be used.
  *
  * @author sli
  * @see #create()
+ * @see #parse(String)
  */
 public final class JSONata {
 
