@@ -37,7 +37,7 @@ public class JSONataOptionsTests {
         InputStream sourceStream = new URL(
             "https://cdn.jsdelivr.net/npm/jsonata@1.8.3/jsonata-es5.min.js").openStream();
         Reader sourceReader = new InputStreamReader(sourceStream, UTF_8)) {
-      sourceString = readerToString(sourceReader);
+      sourceString = readerToString(sourceReader, 1 << 16);
     }
     final JSONata jsonata = JSONata.create(JSONataOptions.newBuilder()
         .setJSONataJsSource(sourceString)

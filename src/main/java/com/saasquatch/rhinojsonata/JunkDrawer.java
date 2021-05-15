@@ -63,9 +63,6 @@ final class JunkDrawer {
       + "    });\n"
       + "}";
 
-  // Lazy init
-  private static String defaultJSONataSource;
-
   private JunkDrawer() {}
 
   public static <T> T rethrowRhinoException(Context cx, Scriptable scope, RhinoException e) {
@@ -113,9 +110,9 @@ final class JunkDrawer {
     }
   }
 
-  public static String readerToString(Reader reader) throws IOException {
-    final char[] buf = new char[8192];
-    final StringBuilder sb = new StringBuilder();
+  public static String readerToString(Reader reader, int bufferSize) throws IOException {
+    final char[] buf = new char[bufferSize];
+    final StringBuilder sb = new StringBuilder(bufferSize);
     int numCharsRead;
     while ((numCharsRead = reader.read(buf, 0, buf.length)) != -1) {
       sb.append(buf, 0, numCharsRead);
@@ -124,21 +121,14 @@ final class JunkDrawer {
   }
 
   public static String getDefaultJSONataSource() {
-    String s = defaultJSONataSource;
-    if (s == null) {
-      defaultJSONataSource = s = loadDefaultJSONataJsSource();
-    }
-    return s;
-  }
-
-  private static String loadDefaultJSONataJsSource() {
     try (
         InputStream jsonataSourceStream = JSONataExpression.class.getResourceAsStream(
             "/saasquatch-jsonata-es5.min.js");
         Reader jsonataSourceReader = new InputStreamReader(
             Objects.requireNonNull(jsonataSourceStream), UTF_8)
     ) {
-      return readerToString(jsonataSourceReader);
+      // The source for jsonata-es5.min.js is just over 100 KB
+      return readerToString(jsonataSourceReader, 150_000);
     } catch (IOException e) {
       throw new JSONataException(e.getMessage(), e);
     }

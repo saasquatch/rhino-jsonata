@@ -6,7 +6,6 @@ import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -85,7 +84,7 @@ public class JunkDrawerTests {
     final byte[] bytes = new byte[100_000];
     ThreadLocalRandom.current().nextBytes(bytes);
     final String readerToString = readerToString(
-        new InputStreamReader(new ByteArrayInputStream(bytes), UTF_8));
+        new InputStreamReader(new ByteArrayInputStream(bytes), UTF_8), 1024);
     assertEquals(new String(bytes, UTF_8), readerToString);
   }
 
@@ -97,11 +96,6 @@ public class JunkDrawerTests {
         .collect(Collectors.toSet());
     assertEquals(1, sources.size());
     assertFalse(sources.iterator().next().isEmpty());
-  }
-
-  @Test
-  public void testLoadJSONataSourceLazyInit() {
-    assertSame(getDefaultJSONataSource(), getDefaultJSONataSource());
   }
 
 }
