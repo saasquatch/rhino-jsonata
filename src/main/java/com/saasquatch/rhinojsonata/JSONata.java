@@ -17,7 +17,10 @@ import org.mozilla.javascript.ScriptableObject;
 
 /**
  * This class represents a JSONata runtime.<br>Calling {@link JSONata#create()} is equivalent to
- * calling {@code require("jsonata")} in jsonata-js.
+ * calling {@code require("jsonata")} in jsonata-js.<br>Creating an instanceof {@link JSONata} is an
+ * expensive operation, as it needs to get the jsonata-es5.min.js source code from disk and execute
+ * it. It is therefore highly recommended that you keep one shared global instance of {@link
+ * JSONata}.
  *
  * @author sli
  * @see #create()
@@ -38,8 +41,8 @@ public final class JSONata {
   }
 
   /**
-   * Parse the given JSONata expression.<br>
-   * This method is equivalent to calling {@code jsonata("jsonata expression")} in jsonata-js.
+   * Parse the given JSONata expression.<br>This method is equivalent to calling {@code
+   * jsonata("jsonata expression")} in jsonata-js.
    */
   public JSONataExpression parse(@Nonnull String expression) {
     Objects.requireNonNull(expression);
