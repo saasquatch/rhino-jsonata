@@ -78,18 +78,18 @@ final class JunkDrawer {
       final Object embeddedJsValue = ((JavaScriptException) e).getValue();
       final String message;
       if (embeddedJsValue == null) {
-        message = e.getMessage();
+        message = e.details();
       } else if (embeddedJsValue instanceof CharSequence) {
         message = embeddedJsValue.toString();
       } else if (embeddedJsValue.getClass().getSimpleName().equals("NativeError")) {
         // The NativeError class isn't accessible
-        message = e.getMessage();
+        message = e.details();
       } else {
         message = NativeJSON.stringify(cx, scope, embeddedJsValue, null, null).toString();
       }
       throw new JSONataException(message, e);
     } else {
-      throw new JSONataException(e.getMessage(), e);
+      throw new JSONataException(e.details(), e);
     }
   }
 
