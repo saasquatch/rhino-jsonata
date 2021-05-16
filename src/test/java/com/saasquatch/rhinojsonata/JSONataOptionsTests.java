@@ -1,12 +1,14 @@
 package com.saasquatch.rhinojsonata;
 
-import static com.saasquatch.rhinojsonata.JunkDrawer.readToString;
+import static com.saasquatch.rhinojsonata.JunkDrawer.readerToString;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
 import org.junit.jupiter.api.Test;
 
@@ -31,9 +33,12 @@ public class JSONataOptionsTests {
   @Test
   public void testCustomJsSource() throws Exception {
     final String sourceString;
-    try (InputStream sourceStream = new URL(
-        "https://cdn.jsdelivr.net/npm/jsonata@1.8.3/jsonata-es5.min.js").openStream()) {
-      sourceString = readToString(sourceStream, UTF_8);
+    try (
+        InputStream sourceStream = new URL(
+            "https://cdn.jsdelivr.net/npm/jsonata@1.8.3/jsonata-es5.min.js").openStream();
+        Reader sourceReader = new InputStreamReader(sourceStream, UTF_8)
+    ) {
+      sourceString = readerToString(sourceReader);
     }
     final JSONata jsonata = JSONata.create(JSONataOptions.newBuilder()
         .setJSONataJsSource(sourceString)

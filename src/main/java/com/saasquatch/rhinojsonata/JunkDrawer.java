@@ -4,10 +4,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -118,21 +118,24 @@ final class JunkDrawer {
     }
   }
 
-  public static String readToString(@Nonnull @WillNotClose InputStream inputStream,
-      @Nonnull Charset charset) throws IOException {
-    final ByteArrayOutputStream result = new ByteArrayOutputStream();
-    final byte[] buffer = new byte[8192];
-    int bytesRead;
-    while ((bytesRead = inputStream.read(buffer)) != -1) {
-      result.write(buffer, 0, bytesRead);
+  public static String readerToString(@Nonnull @WillNotClose Reader reader) throws IOException {
+    final StringBuilder sb = new StringBuilder();
+    final char[] buffer = new char[8192];
+    int charsRead;
+    while ((charsRead = reader.read(buffer)) != -1) {
+      sb.append(buffer, 0, charsRead);
     }
-    return result.toString(charset.name());
+    return sb.toString();
   }
 
   public static String getDefaultJSONataSource() {
-    try (InputStream jsonataSourceStream = JSONata.class.getResourceAsStream(
-        "/saasquatch-jsonata-es5.min.js")) {
-      return readToString(Objects.requireNonNull(jsonataSourceStream), UTF_8);
+    try (
+        InputStream jsonataSourceStream = JSONata.class.getResourceAsStream(
+            "/saasquatch-jsonata-es5.min.js");
+        Reader jsonataSourceReader = new InputStreamReader(
+            Objects.requireNonNull(jsonataSourceStream), UTF_8)
+    ) {
+      return readerToString(Objects.requireNonNull(jsonataSourceReader));
     } catch (IOException e) {
       throw new JSONataException(e.getMessage(), e);
     }
