@@ -74,7 +74,7 @@ public final class JSONataExpression {
         cx.setOptimizationLevel(-1); // No point in optimizing
         final SquatchContext squatchContext = (SquatchContext) cx;
         squatchContext.timeoutNanos = expressionOptions.evaluateTimeoutNanos;
-        evaluateResult = ScriptableObject.callMethod(expressionNativeObject, EVALUATE,
+        evaluateResult = ScriptableObject.callMethod(cx, expressionNativeObject, EVALUATE,
             new Object[]{jsObject});
       } catch (RhinoException e) {
         return rethrowRhinoException(cx, scope, e);
@@ -125,7 +125,7 @@ public final class JSONataExpression {
     Objects.requireNonNull(jsExpression);
     final Context cx = contextFactory.enterContext();
     try {
-      _assign(name, cx.evaluateString(scope, jsExpression, null, 1, null));
+      _assign(cx, name, cx.evaluateString(scope, jsExpression, null, 1, null));
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
     } finally {
@@ -140,7 +140,7 @@ public final class JSONataExpression {
     Objects.requireNonNull(name);
     final Context cx = contextFactory.enterContext();
     try {
-      _assign(name, jsonNodeToJs(cx, scope, objectMapper, jsonNode));
+      _assign(cx, name, jsonNodeToJs(cx, scope, objectMapper, jsonNode));
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, e);
     } finally {
@@ -148,8 +148,8 @@ public final class JSONataExpression {
     }
   }
 
-  private void _assign(@Nonnull String name, @Nullable Object jsObject) {
-    ScriptableObject.callMethod(expressionNativeObject, ASSIGN, new Object[]{name, jsObject});
+  private void _assign(@Nonnull Context cx, @Nonnull String name, @Nullable Object jsObject) {
+    ScriptableObject.callMethod(cx, expressionNativeObject, ASSIGN, new Object[]{name, jsObject});
   }
 
   /**
@@ -168,7 +168,7 @@ public final class JSONataExpression {
     Objects.requireNonNull(jsFunctionExpression);
     final Context cx = contextFactory.enterContext();
     try {
-      ScriptableObject.callMethod(expressionNativeObject, REGISTER_FUNCTION,
+      ScriptableObject.callMethod(cx, expressionNativeObject, REGISTER_FUNCTION,
           new Object[]{name, cx.evaluateString(scope, jsFunctionExpression, null, 1, null),
               signature == null ? Undefined.instance : signature});
     } catch (RhinoException e) {

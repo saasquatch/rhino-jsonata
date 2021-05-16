@@ -57,7 +57,7 @@ public final class JSONata {
     try {
       cx.setOptimizationLevel(-1); // No point in optimizing
       final NativeObject expressionNativeObject = (NativeObject) ScriptableObject.callMethod(
-          scope, JSONATA, new Object[]{expression});
+          cx, scope, JSONATA, new Object[]{expression});
       return new JSONataExpression(this, expressionNativeObject, expressionOptions);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
