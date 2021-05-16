@@ -25,56 +25,60 @@ public class JunkDrawerTests {
   @Test
   public void testRethrowRhinoException() {
     final Context cx = Context.enter();
-    final Scriptable scope = cx.initSafeStandardObjects();
     try {
-      cx.evaluateString(scope, "throw {foo:true}", null, 1, null);
-      fail();
-    } catch (RhinoException e) {
+      final Scriptable scope = cx.initSafeStandardObjects();
       try {
-        rethrowRhinoException(cx, scope, e);
-      } catch (JSONataException e2) {
-        assertEquals("{\"foo\":true}", e2.getMessage());
+        cx.evaluateString(scope, "throw {foo:true}", null, 1, null);
+        fail();
+      } catch (RhinoException e) {
+        try {
+          rethrowRhinoException(cx, scope, e);
+        } catch (JSONataException e2) {
+          assertEquals("{\"foo\":true}", e2.getMessage());
+        }
       }
-    }
-    try {
-      cx.evaluateString(scope, "throw 'foo'", null, 1, null);
-      fail();
-    } catch (RhinoException e) {
       try {
-        rethrowRhinoException(cx, scope, e);
-      } catch (JSONataException e2) {
-        assertEquals("foo", e2.getMessage());
+        cx.evaluateString(scope, "throw 'foo'", null, 1, null);
+        fail();
+      } catch (RhinoException e) {
+        try {
+          rethrowRhinoException(cx, scope, e);
+        } catch (JSONataException e2) {
+          assertEquals("foo", e2.getMessage());
+        }
       }
-    }
-    try {
-      cx.evaluateString(scope, "throw new Error('foo')", null, 1, null);
-      fail();
-    } catch (RhinoException e) {
       try {
-        rethrowRhinoException(cx, scope, e);
-      } catch (JSONataException e2) {
-        assertTrue(e2.getMessage().startsWith("Error: foo"));
+        cx.evaluateString(scope, "throw new Error('foo')", null, 1, null);
+        fail();
+      } catch (RhinoException e) {
+        try {
+          rethrowRhinoException(cx, scope, e);
+        } catch (JSONataException e2) {
+          assertTrue(e2.getMessage().startsWith("Error: foo"));
+        }
       }
-    }
-    try {
-      cx.evaluateString(scope, "throw 1", null, 1, null);
-      fail();
-    } catch (RhinoException e) {
       try {
-        rethrowRhinoException(cx, scope, e);
-      } catch (JSONataException e2) {
-        assertEquals("1", e2.getMessage());
+        cx.evaluateString(scope, "throw 1", null, 1, null);
+        fail();
+      } catch (RhinoException e) {
+        try {
+          rethrowRhinoException(cx, scope, e);
+        } catch (JSONataException e2) {
+          assertEquals("1", e2.getMessage());
+        }
       }
-    }
-    try {
-      cx.evaluateString(scope, "(", null, 1, null);
-      fail();
-    } catch (RhinoException e) {
       try {
-        rethrowRhinoException(cx, scope, e);
-      } catch (JSONataException e2) {
-        assertTrue(e2.getMessage().toLowerCase(Locale.ROOT).contains("unexpected"));
+        cx.evaluateString(scope, "(", null, 1, null);
+        fail();
+      } catch (RhinoException e) {
+        try {
+          rethrowRhinoException(cx, scope, e);
+        } catch (JSONataException e2) {
+          assertTrue(e2.getMessage().toLowerCase(Locale.ROOT).contains("unexpected"));
+        }
       }
+    } finally {
+      Context.exit();
     }
   }
 
