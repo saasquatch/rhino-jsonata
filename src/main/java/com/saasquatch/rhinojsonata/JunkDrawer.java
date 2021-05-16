@@ -130,7 +130,7 @@ final class JunkDrawer {
   }
 
   public static String getDefaultJSONataSource() {
-    try (InputStream jsonataSourceStream = JSONataExpression.class.getResourceAsStream(
+    try (InputStream jsonataSourceStream = JSONata.class.getResourceAsStream(
         "/saasquatch-jsonata-es5.min.js")) {
       // The source for jsonata-es5.min.js is just over 100 KB
       return readToString(Objects.requireNonNull(jsonataSourceStream), UTF_8);
