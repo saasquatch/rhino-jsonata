@@ -32,10 +32,11 @@ public class JSONataOptionsTests {
 
   @Test
   public void testCustomJsSource() throws Exception {
+    @SuppressWarnings("SpellCheckingInspection") final String customSourceUrl =
+        "https://cdn.jsdelivr.net/npm/jsonata@1.8.3/jsonata-es5.min.js";
     final String sourceString;
     try (
-        InputStream sourceStream = new URL(
-            "https://cdn.jsdelivr.net/npm/jsonata@1.8.3/jsonata-es5.min.js").openStream();
+        InputStream sourceStream = new URL(customSourceUrl).openStream();
         Reader sourceReader = new InputStreamReader(sourceStream, UTF_8)
     ) {
       sourceString = readerToString(sourceReader);
