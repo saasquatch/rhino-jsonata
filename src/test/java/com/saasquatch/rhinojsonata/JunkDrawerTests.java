@@ -77,6 +77,16 @@ public class JunkDrawerTests {
           assertTrue(e2.getMessage().toLowerCase(Locale.ROOT).contains("unexpected"));
         }
       }
+      try {
+        cx.evaluateString(scope, "foo.bar", null, 1, null);
+        fail();
+      } catch (RhinoException e) {
+        try {
+          rethrowRhinoException(cx, scope, e);
+        } catch (JSONataException e2) {
+          assertTrue(e2.getMessage().toLowerCase(Locale.ROOT).contains("not defined"));
+        }
+      }
     } finally {
       Context.exit();
     }
