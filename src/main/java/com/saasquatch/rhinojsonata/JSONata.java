@@ -87,7 +87,7 @@ public final class JSONata {
    */
   public static JSONata create(@Nonnull JSONataOptions options) {
     // Avoid using the global ContextFactory
-    final ContextFactory contextFactory = new ContextFactory();
+    final ContextFactory contextFactory = SquatchContextFactory.INSTANCE;
     final String jsonataJsString =
         options.jsonataJsSource == null ? getDefaultJSONataSource() : options.jsonataJsSource;
     final Scriptable scope = createScope(contextFactory);
