@@ -21,7 +21,7 @@ final class SquatchContextFactory extends ContextFactory {
     final SquatchContext squatchContext = (SquatchContext) cx;
     if (squatchContext.timeoutNanos > 0) {
       final long elapsedNanos = System.nanoTime() - squatchContext.startTimeNanos;
-      if (elapsedNanos >= squatchContext.timeoutNanos) {
+      if (elapsedNanos < 0 || elapsedNanos >= squatchContext.timeoutNanos) {
         // This has to an Error instead of an Exception
         throw new SquatchTimeoutError();
       }
