@@ -47,13 +47,18 @@ public final class JSONata {
    * jsonata("jsonata expression")} in jsonata-js.
    */
   public JSONataExpression parse(@Nonnull String expression) {
+    return parse(expression, JSONataExpressionOptions.newBuilder().build());
+  }
+
+  public JSONataExpression parse(@Nonnull String expression,
+      @Nonnull JSONataExpressionOptions expressionOptions) {
     Objects.requireNonNull(expression);
     final Context cx = contextFactory.enterContext();
     try {
       cx.setOptimizationLevel(-1); // No point in optimizing
       final NativeObject expressionNativeObject = (NativeObject) ScriptableObject.callMethod(
           scope, JSONATA, new Object[]{expression});
-      return new JSONataExpression(this, expressionNativeObject);
+      return new JSONataExpression(this, expressionNativeObject, expressionOptions);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
     } finally {

@@ -40,13 +40,16 @@ public final class JSONataExpression {
   private final ObjectMapper objectMapper;
   private final JSONata jsonata;
   private final NativeObject expressionNativeObject;
+  private final JSONataExpressionOptions expressionOptions;
 
-  JSONataExpression(@Nonnull JSONata jsonata, @Nonnull NativeObject expressionNativeObject) {
+  JSONataExpression(@Nonnull JSONata jsonata, @Nonnull NativeObject expressionNativeObject,
+      @Nonnull JSONataExpressionOptions expressionOptions) {
     this.contextFactory = jsonata.contextFactory;
     this.scope = jsonata.scope;
     this.objectMapper = jsonata.objectMapper;
     this.jsonata = jsonata;
     this.expressionNativeObject = expressionNativeObject;
+    this.expressionOptions = expressionOptions;
   }
 
   /**
@@ -60,25 +63,47 @@ public final class JSONataExpression {
    * Evaluate the compiled JSONata expression with the given input.
    */
   public JsonNode evaluate(@Nullable JsonNode input) {
-    final Context cx = contextFactory.enterContext();
+    // This does not need to be locked
+    final Object jsObject = toJsObject(input);
+    final Object evaluateResult;
+    evaluateLock.lock();
     try {
-      cx.setOptimizationLevel(-1); // No point in optimizing
-      final Object evaluateResult;
-      final Object jsObject = jsonNodeToJs(cx, scope, objectMapper, input);
-      evaluateLock.lock();
+      // Create cx inside the lock so the correct start time is recorded
+      final Context cx = contextFactory.enterContext();
       try {
+        cx.setOptimizationLevel(-1); // No point in optimizing
+        final SquatchContext squatchContext = (SquatchContext) cx;
+        squatchContext.timeoutNanos = expressionOptions.evaluateTimeoutNanos;
         evaluateResult = ScriptableObject.callMethod(expressionNativeObject, EVALUATE,
             new Object[]{jsObject});
+      } catch (RhinoException e) {
+        return rethrowRhinoException(cx, scope, e);
       } finally {
-        evaluateLock.unlock();
+        Context.exit();
       }
-      if (evaluateResult instanceof Undefined) {
-        return JsonNodeFactory.instance.missingNode();
-      }
+    } finally {
+      evaluateLock.unlock();
+    }
+    if (evaluateResult instanceof Undefined) {
+      return JsonNodeFactory.instance.missingNode();
+    }
+    return toJsonNode(evaluateResult);
+  }
+
+  private Object toJsObject(@Nullable JsonNode input) {
+    final Context cx = contextFactory.enterContext();
+    try {
+      return jsonNodeToJs(cx, scope, objectMapper, input);
+    } finally {
+      Context.exit();
+    }
+  }
+
+  private JsonNode toJsonNode(@Nullable Object jsObject) {
+    final Context cx = contextFactory.enterContext();
+    try {
       return objectMapper.readTree(NativeJSON.stringify(
-          cx, scope, evaluateResult, null, null).toString());
-    } catch (RhinoException e) {
-      return rethrowRhinoException(cx, scope, e);
+          cx, scope, jsObject, null, null).toString());
     } catch (IOException e) {
       throw new JSONataException(e.getMessage(), e);
     } finally {
