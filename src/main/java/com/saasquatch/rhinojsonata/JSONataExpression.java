@@ -62,6 +62,7 @@ public final class JSONataExpression {
   public JsonNode evaluate(@Nullable JsonNode input) {
     final Context cx = contextFactory.enterContext();
     try {
+      cx.setOptimizationLevel(-1); // No point in optimizing
       final Object evaluateResult;
       final Object jsObject = jsonNodeToJs(cx, scope, objectMapper, input);
       evaluateLock.lock();

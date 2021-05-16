@@ -50,6 +50,7 @@ public final class JSONata {
     Objects.requireNonNull(expression);
     final Context cx = contextFactory.enterContext();
     try {
+      cx.setOptimizationLevel(-1); // No point in optimizing
       final NativeObject expressionNativeObject = (NativeObject) ScriptableObject.callMethod(
           scope, JSONATA, new Object[]{expression});
       return new JSONataExpression(this, expressionNativeObject);
