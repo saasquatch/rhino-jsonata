@@ -21,12 +21,13 @@ public final class JSONataExpressionOptions {
 
     private Builder() {}
 
-    public void setEvaluateTimeout(@Nonnull Duration evaluateTimeout) {
+    public Builder setEvaluateTimeout(@Nonnull Duration evaluateTimeout) {
       final long evaluateTimeoutNanos = evaluateTimeout.toNanos();
       if (evaluateTimeoutNanos <= 0) {
         throw new IllegalArgumentException("evaluateTimeoutNanos has to be positive");
       }
       this.evaluateTimeoutNanos = evaluateTimeoutNanos;
+      return this;
     }
 
     public JSONataExpressionOptions build() {
