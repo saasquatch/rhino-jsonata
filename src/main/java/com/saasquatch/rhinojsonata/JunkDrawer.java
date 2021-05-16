@@ -34,6 +34,7 @@ final class JunkDrawer {
    * The code comes from https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158
    * It is licenced under MIT License
    */
+  @SuppressWarnings("SpellCheckingInspection")
   public static final String TIMEBOX_EXPRESSION_JS = ""
       + "(expr, timeout, maxDepth) => {\n"
       + "    var depth = 0;\n"
