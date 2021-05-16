@@ -80,6 +80,9 @@ public final class JSONataExpression {
         return rethrowRhinoException(cx, scope, e);
       } catch (SquatchTimeoutError e) {
         throw new JSONataException("Expression evaluation timeout: Check for infinite loop");
+      } catch (StackOverflowError e) {
+        throw new JSONataException("Stack overflow error: Check for non-terminating recursive "
+            + "function. Consider rewriting as tail-recursive.", e);
       } finally {
         Context.exit();
       }
