@@ -78,6 +78,8 @@ public final class JSONataExpression {
             new Object[]{jsObject});
       } catch (RhinoException e) {
         return rethrowRhinoException(cx, scope, e);
+      } catch (SquatchTimeoutError e) {
+        throw new JSONataException("Expression evaluation timeout: Check for infinite loop");
       } finally {
         Context.exit();
       }
