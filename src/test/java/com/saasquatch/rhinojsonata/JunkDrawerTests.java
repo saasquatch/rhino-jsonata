@@ -1,6 +1,6 @@
 package com.saasquatch.rhinojsonata;
 
-import static com.saasquatch.rhinojsonata.JunkDrawer.getDefaultJSONataSource;
+import static com.saasquatch.rhinojsonata.JunkDrawer.loadDefaultJSONataSource;
 import static com.saasquatch.rhinojsonata.JunkDrawer.readerToString;
 import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -106,7 +106,7 @@ public class JunkDrawerTests {
   public void testLoadJSONataSource() {
     final Set<String> sources = IntStream.range(0, 100)
         .parallel()
-        .mapToObj(i -> getDefaultJSONataSource())
+        .mapToObj(i -> loadDefaultJSONataSource())
         .collect(Collectors.toSet());
     assertEquals(1, sources.size());
     assertFalse(sources.iterator().next().isEmpty());

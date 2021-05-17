@@ -129,7 +129,7 @@ final class JunkDrawer {
     return sb.toString();
   }
 
-  public static String getDefaultJSONataSource() {
+  public static String loadDefaultJSONataSource() {
     try (
         InputStream jsonataSourceStream = JSONata.class.getResourceAsStream("jsonata-es5.min.js");
         Reader jsonataSourceReader = new InputStreamReader(

@@ -2,7 +2,7 @@ package com.saasquatch.rhinojsonata;
 
 import static com.saasquatch.rhinojsonata.JunkDrawer.JSONATA;
 import static com.saasquatch.rhinojsonata.JunkDrawer.TIMEBOX_EXPRESSION_JS;
-import static com.saasquatch.rhinojsonata.JunkDrawer.getDefaultJSONataSource;
+import static com.saasquatch.rhinojsonata.JunkDrawer.loadDefaultJSONataSource;
 import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -94,7 +94,7 @@ public final class JSONata {
     // Avoid using the global ContextFactory
     final ContextFactory contextFactory = SquatchContextFactory.INSTANCE;
     final String jsonataJsString =
-        options.jsonataJsSource == null ? getDefaultJSONataSource() : options.jsonataJsSource;
+        options.jsonataJsSource == null ? loadDefaultJSONataSource() : options.jsonataJsSource;
     final Scriptable scope = createScope(contextFactory);
     final Context cx = contextFactory.enterContext();
     try {
