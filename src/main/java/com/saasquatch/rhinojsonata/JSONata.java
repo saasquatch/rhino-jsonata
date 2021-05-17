@@ -31,14 +31,14 @@ public final class JSONata {
 
   // Lazy init
   private Function timeboxFunction;
-  final Scriptable scope;
   final ContextFactory contextFactory;
+  final Scriptable scope;
   final ObjectMapper objectMapper;
 
-  private JSONata(@Nonnull Scriptable scope, @Nonnull ContextFactory contextFactory,
+  private JSONata(@Nonnull ContextFactory contextFactory, @Nonnull Scriptable scope,
       @Nonnull ObjectMapper objectMapper) {
-    this.scope = scope;
     this.contextFactory = contextFactory;
+    this.scope = scope;
     this.objectMapper = objectMapper;
   }
 
@@ -99,7 +99,7 @@ public final class JSONata {
     final Context cx = contextFactory.enterContext();
     try {
       cx.evaluateString(scope, jsonataJsString, null, 1, null);
-      return new JSONata(scope, contextFactory,
+      return new JSONata(contextFactory, scope,
           options.objectMapper == null ? new ObjectMapper() : options.objectMapper);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, e);
