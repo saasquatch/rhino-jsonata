@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -74,7 +75,7 @@ public class JunkDrawerTests {
           rethrowRhinoException(cx, scope, objectMapper, e);
         } catch (JSONataException e2) {
           assertEquals("1", e2.getMessage());
-          assertEquals(1, e2.getErrorJson().intValue());
+          assertEquals(1, Objects.requireNonNull(e2.getErrorJson()).intValue());
         }
       }
       try {
@@ -96,7 +97,7 @@ public class JunkDrawerTests {
           rethrowRhinoException(cx, scope, objectMapper, e);
         } catch (JSONataException e2) {
           assertEquals("[1]", e2.getMessage());
-          assertEquals("[1]", e2.getErrorJson().toString());
+          assertEquals("[1]", Objects.requireNonNull(e2.getErrorJson()).toString());
         }
       }
       try {
@@ -106,7 +107,29 @@ public class JunkDrawerTests {
         try {
           rethrowRhinoException(cx, scope, objectMapper, e);
         } catch (JSONataException e2) {
-          assertNull(e2.getMessage());
+          assertEquals("undefined", e2.getMessage());
+          assertNull(e2.getErrorJson());
+        }
+      }
+      try {
+        cx.evaluateString(scope, "throw null", null, 1, null);
+        fail();
+      } catch (RhinoException e) {
+        try {
+          rethrowRhinoException(cx, scope, objectMapper, e);
+        } catch (JSONataException e2) {
+          assertEquals("null", e2.getMessage());
+          assertNull(e2.getErrorJson());
+        }
+      }
+      try {
+        cx.evaluateString(scope, "throw undefined", null, 1, null);
+        fail();
+      } catch (RhinoException e) {
+        try {
+          rethrowRhinoException(cx, scope, objectMapper, e);
+        } catch (JSONataException e2) {
+          assertEquals("undefined", e2.getMessage());
           assertNull(e2.getErrorJson());
         }
       }
