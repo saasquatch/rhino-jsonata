@@ -89,7 +89,7 @@ final class JunkDrawer {
       } else {
         final String embeddedJsValueStringify = Optional.ofNullable(NativeJSON.stringify(
             cx, scope, embeddedJsValue, null, null).toString())
-            .filter(s -> !s.startsWith(Undefined.class.getSimpleName()))
+            .filter(s -> !s.startsWith(Undefined.class.getName()))
             .orElse(null);
         if (embeddedJsValueStringify != null) {
           try {
