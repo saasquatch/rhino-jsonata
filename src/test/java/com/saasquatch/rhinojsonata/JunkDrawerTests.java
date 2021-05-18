@@ -112,6 +112,17 @@ public class JunkDrawerTests {
         }
       }
       try {
+        cx.evaluateString(scope, "throw a => {}", null, 1, null);
+        fail();
+      } catch (RhinoException e) {
+        try {
+          rethrowRhinoException(cx, scope, objectMapper, e);
+        } catch (JSONataException e2) {
+          assertEquals("undefined", e2.getMessage());
+          assertNull(e2.getErrorJson());
+        }
+      }
+      try {
         cx.evaluateString(scope, "throw null", null, 1, null);
         fail();
       } catch (RhinoException e) {
