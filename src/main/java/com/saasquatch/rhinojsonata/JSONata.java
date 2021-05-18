@@ -101,8 +101,7 @@ public final class JSONata {
     final Context cx = contextFactory.enterContext();
     try {
       cx.evaluateString(scope, jsonataJsString, null, 1, null);
-      return new JSONata(contextFactory, scope,
-          objectMapper);
+      return new JSONata(contextFactory, scope, objectMapper);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, objectMapper, e);
     } finally {
