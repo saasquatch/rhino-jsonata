@@ -30,7 +30,7 @@ public class JunkDrawerTests {
   @Test
   public void testRethrowRhinoException() {
     final ObjectMapper objectMapper = new ObjectMapper();
-    final Context cx = Context.enter();
+    final Context cx = SquatchContextFactory.INSTANCE.enterContext();
     try {
       final Scriptable scope = cx.initSafeStandardObjects();
       try {
