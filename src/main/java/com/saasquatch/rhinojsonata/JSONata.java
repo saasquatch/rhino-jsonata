@@ -60,7 +60,7 @@ public final class JSONata {
           cx, scope, JSONATA, new Object[]{expression});
       return new JSONataExpression(this, expressionNativeObject, expressionOptions);
     } catch (RhinoException e) {
-      return rethrowRhinoException(cx, scope, e);
+      return rethrowRhinoException(cx, scope, objectMapper, e);
     } finally {
       Context.exit();
     }
@@ -95,14 +95,16 @@ public final class JSONata {
     final ContextFactory contextFactory = SquatchContextFactory.INSTANCE;
     final String jsonataJsString =
         options.jsonataJsSource == null ? loadDefaultJSONataSource() : options.jsonataJsSource;
+    final ObjectMapper objectMapper =
+        options.objectMapper == null ? new ObjectMapper() : options.objectMapper;
     final Scriptable scope = createScope(contextFactory);
     final Context cx = contextFactory.enterContext();
     try {
       cx.evaluateString(scope, jsonataJsString, null, 1, null);
       return new JSONata(contextFactory, scope,
-          options.objectMapper == null ? new ObjectMapper() : options.objectMapper);
+          objectMapper);
     } catch (RhinoException e) {
-      return rethrowRhinoException(cx, scope, e);
+      return rethrowRhinoException(cx, scope, objectMapper, e);
     } finally {
       Context.exit();
     }

@@ -6,9 +6,12 @@ import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.util.Locale;
@@ -25,6 +28,7 @@ public class JunkDrawerTests {
 
   @Test
   public void testRethrowRhinoException() {
+    final ObjectMapper objectMapper = new ObjectMapper();
     final Context cx = Context.enter();
     try {
       final Scriptable scope = cx.initSafeStandardObjects();
@@ -33,9 +37,10 @@ public class JunkDrawerTests {
         fail();
       } catch (RhinoException e) {
         try {
-          rethrowRhinoException(cx, scope, e);
+          rethrowRhinoException(cx, scope, objectMapper, e);
         } catch (JSONataException e2) {
           assertEquals("{\"foo\":true}", e2.getMessage());
+          assertEquals(JsonNodeFactory.instance.objectNode().put("foo", true), e2.getErrorJson());
         }
       }
       try {
@@ -43,9 +48,10 @@ public class JunkDrawerTests {
         fail();
       } catch (RhinoException e) {
         try {
-          rethrowRhinoException(cx, scope, e);
+          rethrowRhinoException(cx, scope, objectMapper, e);
         } catch (JSONataException e2) {
           assertEquals("foo", e2.getMessage());
+          assertEquals(JsonNodeFactory.instance.textNode("foo"), e2.getErrorJson());
         }
       }
       try {
@@ -53,9 +59,11 @@ public class JunkDrawerTests {
         fail();
       } catch (RhinoException e) {
         try {
-          rethrowRhinoException(cx, scope, e);
+          rethrowRhinoException(cx, scope, objectMapper, e);
         } catch (JSONataException e2) {
-          assertTrue(e2.getMessage().startsWith("Error: foo"));
+          assertEquals("Error: foo", e2.getMessage());
+          assertEquals(JsonNodeFactory.instance.objectNode().put("message", "foo"),
+              e2.getErrorJson());
         }
       }
       try {
@@ -63,9 +71,43 @@ public class JunkDrawerTests {
         fail();
       } catch (RhinoException e) {
         try {
-          rethrowRhinoException(cx, scope, e);
+          rethrowRhinoException(cx, scope, objectMapper, e);
         } catch (JSONataException e2) {
           assertEquals("1", e2.getMessage());
+          assertEquals(1, e2.getErrorJson().intValue());
+        }
+      }
+      try {
+        cx.evaluateString(scope, "throw false", null, 1, null);
+        fail();
+      } catch (RhinoException e) {
+        try {
+          rethrowRhinoException(cx, scope, objectMapper, e);
+        } catch (JSONataException e2) {
+          assertEquals("false", e2.getMessage());
+          assertEquals(JsonNodeFactory.instance.booleanNode(false), e2.getErrorJson());
+        }
+      }
+      try {
+        cx.evaluateString(scope, "throw [1]", null, 1, null);
+        fail();
+      } catch (RhinoException e) {
+        try {
+          rethrowRhinoException(cx, scope, objectMapper, e);
+        } catch (JSONataException e2) {
+          assertEquals("[1]", e2.getMessage());
+          assertEquals("[1]", e2.getErrorJson().toString());
+        }
+      }
+      try {
+        cx.evaluateString(scope, "throw function() {}", null, 1, null);
+        fail();
+      } catch (RhinoException e) {
+        try {
+          rethrowRhinoException(cx, scope, objectMapper, e);
+        } catch (JSONataException e2) {
+          assertNull(e2.getMessage());
+          assertNull(e2.getErrorJson());
         }
       }
       try {
@@ -73,9 +115,10 @@ public class JunkDrawerTests {
         fail();
       } catch (RhinoException e) {
         try {
-          rethrowRhinoException(cx, scope, e);
+          rethrowRhinoException(cx, scope, objectMapper, e);
         } catch (JSONataException e2) {
           assertTrue(e2.getMessage().toLowerCase(Locale.ROOT).contains("unexpected"));
+          assertNull(e2.getErrorJson());
         }
       }
       try {
@@ -83,9 +126,10 @@ public class JunkDrawerTests {
         fail();
       } catch (RhinoException e) {
         try {
-          rethrowRhinoException(cx, scope, e);
+          rethrowRhinoException(cx, scope, objectMapper, e);
         } catch (JSONataException e2) {
           assertTrue(e2.getMessage().toLowerCase(Locale.ROOT).contains("not defined"));
+          assertNull(e2.getErrorJson());
         }
       }
     } finally {

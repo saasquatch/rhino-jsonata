@@ -4,11 +4,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Objects;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.WillNotClose;
@@ -74,21 +76,38 @@ final class JunkDrawer {
   private JunkDrawer() {}
 
   public static <T> T rethrowRhinoException(@Nonnull Context cx, @Nonnull Scriptable scope,
-      @Nonnull RhinoException e) {
+      @Nonnull ObjectMapper objectMapper, @Nonnull RhinoException e) {
     if (e instanceof JavaScriptException) {
       final Object embeddedJsValue = ((JavaScriptException) e).getValue();
       final String message;
+      JsonNode errorJson = null;
       if (embeddedJsValue == null) {
         message = e.details();
       } else if (embeddedJsValue instanceof CharSequence) {
         message = embeddedJsValue.toString();
-      } else if (embeddedJsValue.getClass().getSimpleName().equals("NativeError")) {
-        // The NativeError class isn't accessible
-        message = e.details();
+        errorJson = JsonNodeFactory.instance.textNode(message);
       } else {
-        message = NativeJSON.stringify(cx, scope, embeddedJsValue, null, null).toString();
+        final String embeddedJsValueStringify = Optional.ofNullable(NativeJSON.stringify(
+            cx, scope, embeddedJsValue, null, null).toString())
+            .filter(s -> !s.startsWith("org.mozilla.javascript.Undefined"))
+            .orElse(null);
+        if (embeddedJsValueStringify != null) {
+          try {
+            errorJson = objectMapper.readTree(embeddedJsValueStringify);
+          } catch (IOException ioException) {
+            // ignore
+          }
+        }
+        if (embeddedJsValue.getClass().getSimpleName().equals("NativeError")) {
+          // The NativeError class isn't accessible
+          message = e.details();
+        } else {
+          message = Optional.ofNullable(errorJson)
+              .map(_o -> _o.path("message").textValue())
+              .orElse(embeddedJsValueStringify);
+        }
       }
-      throw new JSONataException(message, e);
+      throw new JSONataException(message, e, errorJson);
     } else {
       throw new JSONataException(e.details(), e);
     }

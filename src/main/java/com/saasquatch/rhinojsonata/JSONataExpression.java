@@ -77,7 +77,7 @@ public final class JSONataExpression {
         evaluateResult = ScriptableObject.callMethod(cx, expressionNativeObject, EVALUATE,
             new Object[]{jsObject});
       } catch (RhinoException e) {
-        return rethrowRhinoException(cx, scope, e);
+        return rethrowRhinoException(cx, scope, objectMapper, e);
       } catch (SquatchTimeoutError e) {
         throw new JSONataException("Expression evaluation timeout: Check for infinite loop");
       } catch (StackOverflowError e) {
@@ -132,7 +132,7 @@ public final class JSONataExpression {
     try {
       _assign(cx, name, cx.evaluateString(scope, jsExpression, null, 1, null));
     } catch (RhinoException e) {
-      rethrowRhinoException(cx, scope, e);
+      rethrowRhinoException(cx, scope, objectMapper, e);
     } finally {
       Context.exit();
     }
@@ -147,7 +147,7 @@ public final class JSONataExpression {
     try {
       _assign(cx, name, jsonNodeToJs(cx, scope, objectMapper, jsonNode));
     } catch (RhinoException e) {
-      rethrowRhinoException(cx, scope, e);
+      rethrowRhinoException(cx, scope, objectMapper, e);
     } finally {
       Context.exit();
     }
@@ -177,7 +177,7 @@ public final class JSONataExpression {
           new Object[]{name, cx.evaluateString(scope, jsFunctionExpression, null, 1, null),
               signature == null ? Undefined.instance : signature});
     } catch (RhinoException e) {
-      rethrowRhinoException(cx, scope, e);
+      rethrowRhinoException(cx, scope, objectMapper, e);
     } finally {
       Context.exit();
     }
@@ -196,7 +196,7 @@ public final class JSONataExpression {
       jsonata.getTimeboxExpressionFunction().call(cx, scope, scope,
           new Object[]{expressionNativeObject, timeoutMillis, maxDepth});
     } catch (RhinoException e) {
-      rethrowRhinoException(cx, scope, e);
+      rethrowRhinoException(cx, scope, objectMapper, e);
     } finally {
       Context.exit();
     }
