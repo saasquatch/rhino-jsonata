@@ -1,6 +1,7 @@
 package com.saasquatch.rhinojsonata;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import javax.annotation.Nullable;
 
 public final class JSONataException extends RuntimeException {
 
@@ -19,6 +20,7 @@ public final class JSONataException extends RuntimeException {
     this.errorJson = errorJson;
   }
 
+  @Nullable
   public JsonNode getErrorJson() {
     return errorJson;
   }
