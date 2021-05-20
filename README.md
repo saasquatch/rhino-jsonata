@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/saasquatch/rhino-jsonata.svg?branch=main)](https://travis-ci.org/saasquatch/rhino-jsonata)
 [![](https://jitpack.io/v/saasquatch/rhino-jsonata.svg)](https://jitpack.io/#saasquatch/rhino-jsonata)
 
-JSONata for Java backed by jsonata-js and Rhino
+JSONata library for Java backed by jsonata-js and Rhino
 
 ## Adding it to your project
 
