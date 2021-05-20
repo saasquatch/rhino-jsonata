@@ -47,6 +47,10 @@ Gradle
 compile 'com.github.saasquatch:rhino-jsonata:0.0.1'
 ```
 
+### Transitive Dependencies
+
+This project requires Java 8. The only required transitive dependencies are [Rhino](https://github.com/mozilla/rhino), [Jackson](https://github.com/FasterXML/jackson), and [FindBugs (JSR305)](http://findbugs.sourceforge.net/).
+
 ## License
 
 Unless explicitly stated otherwise all files in this repository are licensed under the Apache
