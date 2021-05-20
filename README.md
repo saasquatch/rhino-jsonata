@@ -6,6 +6,47 @@
 
 JSONata for Java backed by jsonata-js and Rhino
 
+## Adding it to your project
+
+### Add the repository
+
+Maven
+
+```xml
+<repositories>
+  <repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+  </repository>
+</repositories>
+```
+
+Gradle
+
+```gradle
+repositories {
+  maven { url 'https://jitpack.io' }
+}
+```
+
+### Add the dependency
+
+Maven
+
+```xml
+<dependency>
+  <groupId>com.github.saasquatch</groupId>
+  <artifactId>rhino-jsonata</artifactId>
+  <version>0.0.1</version>
+</dependency>
+```
+
+Gradle
+
+```gradle
+compile 'com.github.saasquatch:rhino-jsonata:0.0.1'
+```
+
 ## License
 
 Unless explicitly stated otherwise all files in this repository are licensed under the Apache
