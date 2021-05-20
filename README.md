@@ -1,5 +1,9 @@
 # rhino-jsonata
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Build Status](https://travis-ci.org/saasquatch/rhino-jsonata.svg?branch=main)](https://travis-ci.org/saasquatch/rhino-jsonata)
+[![](https://jitpack.io/v/saasquatch/rhino-jsonata.svg)](https://jitpack.io/#saasquatch/rhino-jsonata)
+
 JSONata for Java backed by jsonata-js and Rhino
 
 ## License
