@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
  *
  * @author sli
  * @see #newBuilder()
+ * @see JSONata#create(JSONataOptions)
  */
 public final class JSONataOptions {
 

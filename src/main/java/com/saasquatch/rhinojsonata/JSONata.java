@@ -50,6 +50,9 @@ public final class JSONata {
     return parse(expression, JSONataExpressionOptions.newBuilder().build());
   }
 
+  /**
+   * Parse the given JSONata expression with custom options.
+   */
   public JSONataExpression parse(@Nonnull String expression,
       @Nonnull JSONataExpressionOptions expressionOptions) {
     Objects.requireNonNull(expression);

@@ -9,6 +9,7 @@ import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.saasquatch.rhinojsonata.annotations.Beta;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Objects;
@@ -79,8 +80,16 @@ public final class JSONataExpression {
       } catch (RhinoException e) {
         return rethrowRhinoException(cx, scope, objectMapper, e);
       } catch (SquatchTimeoutError e) {
+        /*
+         * The error message comes from https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158
+         * It is licenced under MIT License
+         */
         throw new JSONataException("Expression evaluation timeout: Check for infinite loop");
       } catch (StackOverflowError e) {
+        /*
+         * The error message comes from https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158
+         * It is licenced under MIT License
+         */
         throw new JSONataException("Stack overflow error: Check for non-terminating recursive "
             + "function. Consider rewriting as tail-recursive.", e);
       } finally {
@@ -183,6 +192,7 @@ public final class JSONataExpression {
     }
   }
 
+  @Beta
   public void timeboxExpression(@Nonnull Duration timeout, int maxDepth) {
     final int timeoutMillis = (int) timeout.toMillis();
     if (timeoutMillis <= 0) {
