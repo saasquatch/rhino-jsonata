@@ -6,6 +6,20 @@
 
 JSONata library for Java backed by jsonata-js and Rhino
 
+## Quick start
+
+The following is the equivalent of the [example provided by jsonata-js](https://github.com/jsonata-js/jsonata/tree/4c54db20a9782656e25aacd45df584e7c54210e6#quick-start).
+
+```java
+final ObjectMapper objectMapper = new ObjectMapper();
+final JSONata jsonata = JSONata.create();
+final JsonNode data = objectMapper.readTree(
+    "{\"example\":[{\"value\":4},{\"value\":7},{\"value\":13}]}");
+final JSONataExpression expression = jsonata.parse("$sum(example.value)");
+final JsonNode result = expression.evaluate(data);
+System.out.println(result); // prints 24
+```
+
 ## Adding it to your project
 
 ### Add the repository
