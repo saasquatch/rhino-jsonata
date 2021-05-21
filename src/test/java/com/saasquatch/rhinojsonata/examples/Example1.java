@@ -14,7 +14,7 @@ public class Example1 {
         "{\"example\":[{\"value\":4},{\"value\":7},{\"value\":13}]}");
     final JSONataExpression expression = jsonata.parse("$sum(example.value)");
     final JsonNode result = expression.evaluate(data);
-    System.out.println(result); // prints 24
+    System.out.println(objectMapper.writeValueAsString(result)); // prints 24
   }
 
 }

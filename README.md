@@ -17,7 +17,7 @@ final JsonNode data = objectMapper.readTree(
     "{\"example\":[{\"value\":4},{\"value\":7},{\"value\":13}]}");
 final JSONataExpression expression = jsonata.parse("$sum(example.value)");
 final JsonNode result = expression.evaluate(data);
-System.out.println(result); // prints 24
+System.out.println(objectMapper.writeValueAsString(result)); // prints 24
 ```
 
 For documentation on JSONata itself, please refer to the official [JSONata docs](https://docs.jsonata.org).
