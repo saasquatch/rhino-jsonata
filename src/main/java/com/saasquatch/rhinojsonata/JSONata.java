@@ -93,14 +93,14 @@ public final class JSONata {
   public static JSONata create(@Nonnull JSONataOptions options) {
     // Avoid using the global ContextFactory
     final ContextFactory contextFactory = SquatchContextFactory.INSTANCE;
-    final String jsonataJsString =
+    final String jsonataJsSource =
         options.jsonataJsSource == null ? loadDefaultJSONataSource() : options.jsonataJsSource;
     final ObjectMapper objectMapper =
         options.objectMapper == null ? new ObjectMapper() : options.objectMapper;
     final Scriptable scope = createScope(contextFactory);
     final Context cx = contextFactory.enterContext();
     try {
-      cx.evaluateString(scope, jsonataJsString, null, 1, null);
+      cx.evaluateString(scope, jsonataJsSource, null, 1, null);
       return new JSONata(contextFactory, scope, objectMapper);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, objectMapper, e);
