@@ -13,9 +13,18 @@ import javax.annotation.Nonnull;
 public final class JSONataExpressionOptions {
 
   final long evaluateTimeoutNanos;
+  final int timeboxExpressionTimeboxMillis;
+  final int timeboxExpressionMaxDepth;
 
-  private JSONataExpressionOptions(long evaluateTimeoutNanos) {
+  private JSONataExpressionOptions(long evaluateTimeoutNanos, int timeboxExpressionTimeboxMillis,
+      int timeboxExpressionMaxDepth) {
     this.evaluateTimeoutNanos = evaluateTimeoutNanos;
+    this.timeboxExpressionTimeboxMillis = timeboxExpressionTimeboxMillis;
+    this.timeboxExpressionMaxDepth = timeboxExpressionMaxDepth;
+  }
+
+  boolean isTimeboxExpressions() {
+    return timeboxExpressionTimeboxMillis > 0;
   }
 
   public static Builder newBuilder() {
@@ -25,6 +34,8 @@ public final class JSONataExpressionOptions {
   public static final class Builder {
 
     private long evaluateTimeoutNanos;
+    private int timeboxExpressionTimeboxMillis;
+    private int timeboxExpressionMaxDepth;
 
     private Builder() {}
 
@@ -41,8 +52,22 @@ public final class JSONataExpressionOptions {
       return this;
     }
 
+    public Builder timeboxExpression(@Nonnull Duration timeout, int maxDepth) {
+      final int timeoutMillis = (int) timeout.toMillis();
+      if (timeoutMillis <= 0) {
+        throw new IllegalArgumentException("timeout has to be positive");
+      }
+      if (maxDepth <= 0) {
+        throw new IllegalArgumentException("maxDepth has to be positive");
+      }
+      this.timeboxExpressionTimeboxMillis = timeoutMillis;
+      this.timeboxExpressionMaxDepth = maxDepth;
+      return this;
+    }
+
     public JSONataExpressionOptions build() {
-      return new JSONataExpressionOptions(evaluateTimeoutNanos);
+      return new JSONataExpressionOptions(evaluateTimeoutNanos, timeboxExpressionTimeboxMillis,
+          timeboxExpressionMaxDepth);
     }
 
   }

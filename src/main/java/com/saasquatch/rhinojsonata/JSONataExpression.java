@@ -67,7 +67,9 @@ public final class JSONataExpression {
     // This does not need to be locked
     final Object jsObject = toJsObject(input);
     final Object evaluateResult;
-    evaluateLock.lock();
+    if (expressionOptions.isTimeboxExpressions()) {
+      evaluateLock.lock();
+    }
     try {
       // Create cx inside the lock so the correct start time is recorded
       final Context cx = contextFactory.enterContext();
@@ -96,7 +98,9 @@ public final class JSONataExpression {
         Context.exit();
       }
     } finally {
-      evaluateLock.unlock();
+      if (expressionOptions.isTimeboxExpressions()) {
+        evaluateLock.unlock();
+      }
     }
     if (evaluateResult instanceof Undefined) {
       return JsonNodeFactory.instance.missingNode();

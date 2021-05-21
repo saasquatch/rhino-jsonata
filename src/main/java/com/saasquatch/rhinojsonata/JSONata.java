@@ -61,6 +61,11 @@ public final class JSONata {
       cx.setOptimizationLevel(-1); // No point in optimizing
       final NativeObject expressionNativeObject = (NativeObject) ScriptableObject.callMethod(
           cx, scope, JSONATA, new Object[]{expression});
+      if (expressionOptions.isTimeboxExpressions()) {
+        getTimeboxExpressionFunction().call(cx, scope, scope,
+            new Object[]{expressionNativeObject, expressionOptions.timeboxExpressionTimeboxMillis,
+                expressionOptions.timeboxExpressionMaxDepth});
+      }
       return new JSONataExpression(this, expressionNativeObject, expressionOptions);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, objectMapper, e);
