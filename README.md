@@ -67,7 +67,7 @@ compile 'com.github.saasquatch:rhino-jsonata:0.0.1'
 
 This project requires Java 8. The only required transitive dependencies are [Rhino](https://github.com/mozilla/rhino), [Jackson](https://github.com/FasterXML/jackson), and [FindBugs (JSR305)](http://findbugs.sourceforge.net/).
 
-### Unastable APIs
+### Unstable APIs
 
 Anything marked with the `@Beta` or `@Internal` annotations are either experimental or considered private API, and can be modified in breaking ways or removed without warning.
 
