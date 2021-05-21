@@ -4,7 +4,13 @@
 [![Build Status](https://travis-ci.org/saasquatch/rhino-jsonata.svg?branch=main)](https://travis-ci.org/saasquatch/rhino-jsonata)
 [![](https://jitpack.io/v/saasquatch/rhino-jsonata.svg)](https://jitpack.io/#saasquatch/rhino-jsonata)
 
-JSONata library for Java backed by jsonata-js and Rhino
+## Introduction
+
+This is a [JSONata](https://jsonata.org/) library for Java backed by [jsonata-js](https://github.com/jsonata-js/jsonata) and [Rhino](https://github.com/mozilla/rhino).
+
+### Compared to [JSONata4Java](https://github.com/IBM/JSONata4Java)
+
+As the title suggests, this library is NOT a native implementation of JSONata in Java. If you are after a native implementation or you are very conscious about performance, then you should be looking at [JSONata4Java](https://github.com/IBM/JSONata4Java), which has a considerable performance advantage over this library for obvious reasons. What this library provides are behavioral consistency and feature parity with jsonata-js (for the most part, see the limitations section for more details), which can be valuable if you have a mixed environment where you need JSONata in both Java and JavaScript. One obvious discrepency between jsonata-js and JSONata4Java is the strictness of the parser. In jsonata-js, this expression `foo (` is considered invalid, while in JSONata4Java it is considered valid. Another advantage from the development perspective is that it stands on the shoulders of jsonata-js, so there is less code to maintain and less code to test.
 
 ## Quick start
 
@@ -21,6 +27,10 @@ System.out.println(objectMapper.writeValueAsString(result)); // prints 24
 ```
 
 For documentation on JSONata itself, please refer to the official [JSONata docs](https://docs.jsonata.org).
+
+## Limitations
+
+TODO
 
 ## Adding it to your project
 
