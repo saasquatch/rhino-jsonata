@@ -1,6 +1,5 @@
 package com.saasquatch.rhinojsonata;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.saasquatch.rhinojsonata.annotations.Beta;
 import java.time.Duration;
 import javax.annotation.Nonnull;
@@ -64,7 +63,7 @@ public final class JSONataExpressionOptions {
      *   <li>This method relies on internal and potentially unstable APIs from jsonata-js, so it's
      *   possible that it won't work with a future version of jsonata-js.</li>
      *   <li>Due to the nature of the jsonata-js internal method, using this method will make the
-     *   {@link JSONataExpression#evaluate(JsonNode)} method not thread safe.</li>
+     *   {@link JSONataExpression#evaluate()} methods not thread safe.</li>
      * </ul>
      */
     @Beta

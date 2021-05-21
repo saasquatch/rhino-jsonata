@@ -11,8 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.mozilla.javascript.Context;
@@ -33,7 +31,6 @@ import org.mozilla.javascript.Undefined;
  */
 public final class JSONataExpression {
 
-  private final Lock evaluateLock = new ReentrantLock();
   private final ContextFactory contextFactory;
   private final Scriptable scope;
   private final ObjectMapper objectMapper;
@@ -63,40 +60,31 @@ public final class JSONataExpression {
     // This does not need to be locked
     final Object jsObject = toJsObject(input);
     final Object evaluateResult;
-    if (expressionOptions.isTimeboxExpressions()) {
-      evaluateLock.lock();
-    }
+    // Create cx inside the lock so the correct start time is recorded
+    final Context cx = contextFactory.enterContext();
     try {
-      // Create cx inside the lock so the correct start time is recorded
-      final Context cx = contextFactory.enterContext();
-      try {
-        cx.setOptimizationLevel(-1); // No point in optimizing
-        final SquatchContext squatchContext = (SquatchContext) cx;
-        squatchContext.timeoutNanos = expressionOptions.evaluateTimeoutNanos;
-        evaluateResult = ScriptableObject.callMethod(cx, expressionNativeObject, EVALUATE,
-            new Object[]{jsObject});
-      } catch (RhinoException e) {
-        return rethrowRhinoException(cx, scope, objectMapper, e);
-      } catch (SquatchTimeoutError e) {
-        /*
-         * The error message comes from https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158
-         * It is licenced under MIT License
-         */
-        throw new JSONataException("Expression evaluation timeout: Check for infinite loop");
-      } catch (StackOverflowError e) {
-        /*
-         * The error message comes from https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158
-         * It is licenced under MIT License
-         */
-        throw new JSONataException("Stack overflow error: Check for non-terminating recursive "
-            + "function. Consider rewriting as tail-recursive.", e);
-      } finally {
-        Context.exit();
-      }
+      cx.setOptimizationLevel(-1); // No point in optimizing
+      final SquatchContext squatchContext = (SquatchContext) cx;
+      squatchContext.timeoutNanos = expressionOptions.evaluateTimeoutNanos;
+      evaluateResult = ScriptableObject.callMethod(cx, expressionNativeObject, EVALUATE,
+          new Object[]{jsObject});
+    } catch (RhinoException e) {
+      return rethrowRhinoException(cx, scope, objectMapper, e);
+    } catch (SquatchTimeoutError e) {
+      /*
+       * The error message comes from https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158
+       * It is licenced under MIT License
+       */
+      throw new JSONataException("Expression evaluation timeout: Check for infinite loop");
+    } catch (StackOverflowError e) {
+      /*
+       * The error message comes from https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158
+       * It is licenced under MIT License
+       */
+      throw new JSONataException("Stack overflow error: Check for non-terminating recursive "
+          + "function. Consider rewriting as tail-recursive.", e);
     } finally {
-      if (expressionOptions.isTimeboxExpressions()) {
-        evaluateLock.unlock();
-      }
+      Context.exit();
     }
     if (evaluateResult instanceof Undefined) {
       return JsonNodeFactory.instance.missingNode();
@@ -170,7 +158,8 @@ public final class JSONataExpression {
    * Bind a JavaScript function to a name in the expression.<br>Note that the JS function string has
    * to be a JS expression whose value is a function, which is to say that {@code "a => a"} and
    * {@code "(function(a) {return a;})"} work, but {@code "function(a) {return a;}"} and {@code
-   * "function foo(a) {return a;}"} do not work.
+   * "function foo(a) {return a;}"} do not work. Also, depending on the nature of the JS function,
+   * it may make the {@link #evaluate()} methods not thread safe.
    *
    * @param signature The JSONata function signature.
    *                  <a href="https://docs.jsonata.org/embedding-extending#function-signature-syntax">
