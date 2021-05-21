@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import java.time.Duration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -184,44 +183,6 @@ public class JSONataExpressionTests {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
       expression.registerFunction("foo", "a => a + a", "<s:s>");
       assertThrows(JSONataException.class, () -> expression.evaluate(null));
-    }
-  }
-
-  @SuppressWarnings("ConstantConditions")
-  @Test
-  public void testTimeboxValidation() {
-    final JSONataExpression expression = jsonata.parse("1");
-    assertThrows(NullPointerException.class, () -> expression.timeboxExpression(null, 1000));
-    assertThrows(IllegalArgumentException.class,
-        () -> expression.timeboxExpression(Duration.ofSeconds(-1), 1000));
-    assertThrows(IllegalArgumentException.class,
-        () -> expression.timeboxExpression(Duration.ofSeconds(1), -1000));
-    assertDoesNotThrow(() -> expression.timeboxExpression(Duration.ofSeconds(1), 1000));
-  }
-
-  @Test
-  public void testTimeboxTimeout() {
-    final JSONataExpression expression = jsonata.parse("($f1 := function($x) { $f1($x) }; $f1(1))");
-    expression.timeboxExpression(Duration.ofMillis(500), Integer.MAX_VALUE);
-    try {
-      expression.evaluate();
-      fail();
-    } catch (JSONataException e) {
-      assertTrue(e.getMessage().contains("timeout"));
-    }
-  }
-
-  @Test
-  public void testTimeboxMaxDepth() {
-    final JSONataExpression expression = jsonata.parse(
-        "($f1 := function($x) { $f1($x) + $f1($x) }; $f1(1))");
-    assertThrows(JSONataException.class, expression::evaluate);
-    expression.timeboxExpression(Duration.ofDays(1), 10);
-    try {
-      expression.evaluate();
-      fail();
-    } catch (JSONataException e) {
-      assertTrue(e.getMessage().contains("Stack overflow"));
     }
   }
 

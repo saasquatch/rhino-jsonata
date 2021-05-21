@@ -9,9 +9,7 @@ import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.saasquatch.rhinojsonata.annotations.Beta;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -39,7 +37,6 @@ public final class JSONataExpression {
   private final ContextFactory contextFactory;
   private final Scriptable scope;
   private final ObjectMapper objectMapper;
-  private final JSONata jsonata;
   private final NativeObject expressionNativeObject;
   private final JSONataExpressionOptions expressionOptions;
 
@@ -48,7 +45,6 @@ public final class JSONataExpression {
     this.contextFactory = jsonata.contextFactory;
     this.scope = jsonata.scope;
     this.objectMapper = jsonata.objectMapper;
-    this.jsonata = jsonata;
     this.expressionNativeObject = expressionNativeObject;
     this.expressionOptions = expressionOptions;
   }
@@ -189,26 +185,6 @@ public final class JSONataExpression {
       ScriptableObject.callMethod(cx, expressionNativeObject, REGISTER_FUNCTION,
           new Object[]{name, cx.evaluateString(scope, jsFunctionExpression, null, 1, null),
               signature == null ? Undefined.instance : signature});
-    } catch (RhinoException e) {
-      rethrowRhinoException(cx, scope, objectMapper, e);
-    } finally {
-      Context.exit();
-    }
-  }
-
-  @Beta
-  public void timeboxExpression(@Nonnull Duration timeout, int maxDepth) {
-    final int timeoutMillis = (int) timeout.toMillis();
-    if (timeoutMillis <= 0) {
-      throw new IllegalArgumentException("timeout has to be positive");
-    }
-    if (maxDepth <= 0) {
-      throw new IllegalArgumentException("maxDepth has to be positive");
-    }
-    final Context cx = contextFactory.enterContext();
-    try {
-      jsonata.getTimeboxExpressionFunction().call(cx, scope, scope,
-          new Object[]{expressionNativeObject, timeoutMillis, maxDepth});
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, objectMapper, e);
     } finally {

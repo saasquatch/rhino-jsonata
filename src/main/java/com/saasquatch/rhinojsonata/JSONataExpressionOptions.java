@@ -1,5 +1,7 @@
 package com.saasquatch.rhinojsonata;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.saasquatch.rhinojsonata.annotations.Beta;
 import java.time.Duration;
 import javax.annotation.Nonnull;
 
@@ -37,12 +39,14 @@ public final class JSONataExpressionOptions {
     private int timeboxExpressionTimeboxMillis;
     private int timeboxExpressionMaxDepth;
 
-    private Builder() {}
+    private Builder() {
+    }
 
     /**
      * Set a timeout for {@link JSONataExpression#evaluate()} methods to protect against infinite
      * loops. Note that this timeout is enforced on the JS runtime level, not within jsonata-js.
      */
+    @Beta
     public Builder setEvaluateTimeout(@Nonnull Duration evaluateTimeout) {
       final long evaluateTimeoutNanos = evaluateTimeout.toNanos();
       if (evaluateTimeoutNanos <= 0) {
@@ -52,6 +56,18 @@ public final class JSONataExpressionOptions {
       return this;
     }
 
+    /**
+     * Set a timeout and a max stack depth to protect against infinite loops. Note that the timeout
+     * and maxDepth are enforced within jsonata-js, not on the JS runtime level.<br>This method has
+     * a few caveats:
+     * <ul>
+     *   <li>This method relies on internal and potentially unstable APIs from jsonata-js, so it's
+     *   possible that it won't work with a future version of jsonata-js.</li>
+     *   <li>Due to the nature of the jsonata-js internal method, using this method will make the
+     *   {@link JSONataExpression#evaluate(JsonNode)} method not thread safe.</li>
+     * </ul>
+     */
+    @Beta
     public Builder timeboxExpression(@Nonnull Duration timeout, int maxDepth) {
       final int timeoutMillis = (int) timeout.toMillis();
       if (timeoutMillis <= 0) {
