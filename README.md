@@ -60,7 +60,7 @@ Maven
 Gradle
 
 ```gradle
-compile 'com.github.saasquatch:rhino-jsonata:0.0.1'
+implementation 'com.github.saasquatch:rhino-jsonata:0.0.1'
 ```
 
 ### Transitive Dependencies
