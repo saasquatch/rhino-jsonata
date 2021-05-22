@@ -58,13 +58,19 @@ public final class JSONataExpression {
   public JsonNode evaluate(@Nullable JsonNode input) {
     final Object jsObject = toJsObject(input);
     final Object evaluateResult;
+    // Only the evaluate call and nothing else should be run in this context
     final Context cx = contextFactory.enterContext();
     try {
       prepEvaluationContext(cx);
       evaluateResult = ScriptableObject.callMethod(cx, expressionNativeObject, EVALUATE,
           new Object[]{jsObject});
     } catch (RhinoException e) {
-      return rethrowRhinoException(cx, scope, objectMapper, e);
+      final Context cx2 = contextFactory.enterContext();
+      try {
+        return rethrowRhinoException(cx2, scope, objectMapper, e);
+      } finally {
+        Context.exit();
+      }
     } catch (SquatchTimeoutError e) {
       /*
        * The error message comes from https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158
