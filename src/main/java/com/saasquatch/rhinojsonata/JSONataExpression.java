@@ -135,7 +135,7 @@ public final class JSONataExpression {
    *                     then this parameter has the same restrictions as the {@link
    *                     JSONataExpression#registerFunction(String, String, String)} method. See
    *                     {@link JSONataExpression#registerFunction(String, String, String)} for more
-   *                     detail.
+   *                     details.
    */
   public void assign(@Nonnull String name, @Nonnull String jsExpression) {
     Objects.requireNonNull(name);
