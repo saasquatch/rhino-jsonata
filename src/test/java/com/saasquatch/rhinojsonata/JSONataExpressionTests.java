@@ -8,6 +8,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -69,6 +72,27 @@ public class JSONataExpressionTests {
     assertEquals(JsonNodeFactory.instance.missingNode(),
         jsonata.parse("foo").evaluate(JsonNodeFactory.instance.objectNode()
             .put("bar", (String) null)));
+  }
+
+  @Test
+  public void testEvaluateWithBindings() {
+    final JSONataExpression expression = jsonata.parse("$foo");
+    //noinspection ConstantConditions
+    assertThrows(NullPointerException.class, () -> expression.evaluate(null, null));
+    assertThrows(NullPointerException.class,
+        () -> {
+          final Map<String, Object> bindings = new HashMap<>();
+          bindings.put("foo", null);
+          expression.evaluate(null, bindings);
+        });
+    assertThrows(JSONataException.class,
+        () -> expression.evaluate(null, ImmutableMap.of("foo", 1)));
+    assertEquals(JsonNodeFactory.instance.missingNode(),
+        expression.evaluate(null, ImmutableMap.of()));
+    assertEquals(JsonNodeFactory.instance.numberNode(1),
+        expression.evaluate(null, ImmutableMap.of("foo", "1")));
+    assertEquals(JsonNodeFactory.instance.numberNode(1), expression
+        .evaluate(null, ImmutableMap.of("foo", JsonNodeFactory.instance.numberNode(1))));
   }
 
   @Test

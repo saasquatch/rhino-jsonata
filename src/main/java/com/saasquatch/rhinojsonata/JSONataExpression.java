@@ -10,6 +10,8 @@ import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -56,14 +58,19 @@ public final class JSONataExpression {
    * Evaluate the compiled JSONata expression with the given input.
    */
   public JsonNode evaluate(@Nullable JsonNode input) {
-    final Object jsObject = toJsObject(input);
+    return evaluate(input, Collections.emptyMap());
+  }
+
+  public JsonNode evaluate(@Nullable JsonNode input, @Nonnull Map<String, Object> bindings) {
+    final Object inputJsObject = toJsObject(input);
+    final Object bindingsJsObject = buildBindings(bindings);
     final Object evaluateResult;
     // Only the evaluate call and nothing else should be run in this context
     final Context cx = contextFactory.enterContext();
     try {
       prepEvaluationContext(cx);
       evaluateResult = ScriptableObject.callMethod(cx, expressionNativeObject, EVALUATE,
-          new Object[]{jsObject});
+          new Object[]{inputJsObject, bindingsJsObject});
     } catch (RhinoException e) {
       final Context cx2 = contextFactory.enterContext();
       try {
@@ -109,6 +116,32 @@ public final class JSONataExpression {
     final Context cx = contextFactory.enterContext();
     try {
       return jsObjectToJsonNode(cx, scope, objectMapper, jsObject);
+    } finally {
+      Context.exit();
+    }
+  }
+
+  private Object buildBindings(@Nonnull Map<String, Object> bindings) {
+    if (bindings.isEmpty()) {
+      return Undefined.instance;
+    }
+    final Context cx = contextFactory.enterContext();
+    try {
+      final NativeObject nativeObject = new NativeObject();
+      for (Map.Entry<String, Object> binding : bindings.entrySet()) {
+        final String name = binding.getKey();
+        final Object bindingValue = Objects.requireNonNull(binding.getValue());
+        final Object bindingJsObject;
+        if (bindingValue instanceof String) {
+          bindingJsObject = cx.evaluateString(scope, (String) bindingValue, null, 1, null);
+        } else if (bindingValue instanceof JsonNode) {
+          bindingJsObject = jsonNodeToJs(cx, scope, objectMapper, (JsonNode) bindingValue);
+        } else {
+          throw new JSONataException("Unrecognized binding type: " + bindingValue.getClass());
+        }
+        ScriptableObject.putProperty(nativeObject, name, bindingJsObject);
+      }
+      return nativeObject;
     } finally {
       Context.exit();
     }
