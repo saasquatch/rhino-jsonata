@@ -3,7 +3,6 @@ package com.saasquatch.rhinojsonata;
 import static com.saasquatch.rhinojsonata.JunkDrawer.ASSIGN;
 import static com.saasquatch.rhinojsonata.JunkDrawer.EVALUATE;
 import static com.saasquatch.rhinojsonata.JunkDrawer.REGISTER_FUNCTION;
-import static com.saasquatch.rhinojsonata.JunkDrawer.createScope;
 import static com.saasquatch.rhinojsonata.JunkDrawer.jsObjectToJsonNode;
 import static com.saasquatch.rhinojsonata.JunkDrawer.jsonNodeToJs;
 import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
@@ -35,18 +34,16 @@ public final class JSONataExpression {
   private final ContextFactory contextFactory;
   private final ObjectMapper objectMapper;
   private final NativeObject expressionNativeObject;
-  private final JSONataExpressionOptions expressionOptions;
   private final Scriptable scope;
+  private final JSONataExpressionOptions expressionOptions;
 
   JSONataExpression(@Nonnull JSONata jsonata, @Nonnull NativeObject expressionNativeObject,
-      @Nonnull JSONataExpressionOptions expressionOptions) {
+      @Nonnull Scriptable scope, @Nonnull JSONataExpressionOptions expressionOptions) {
     this.contextFactory = jsonata.contextFactory;
     this.objectMapper = jsonata.objectMapper;
     this.expressionNativeObject = expressionNativeObject;
+    this.scope = scope;
     this.expressionOptions = expressionOptions;
-    // Every JSONataExpression gets its own scope so the original and likely shared JSONata instance
-    // doesn't get contaminated
-    this.scope = createScope(contextFactory);
   }
 
   /**

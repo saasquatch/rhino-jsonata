@@ -67,7 +67,12 @@ public final class JSONata {
             new Object[]{expressionNativeObject, expressionOptions.timeboxExpressionTimeboxMillis,
                 expressionOptions.timeboxExpressionMaxDepth});
       }
-      return new JSONataExpression(this, expressionNativeObject, expressionOptions);
+      /*
+       * Every JSONataExpression gets its own scope so the original and likely shared JSONata
+       * instance doesn't get contaminated
+       */
+      return new JSONataExpression(this, expressionNativeObject, createScope(contextFactory),
+          expressionOptions);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, objectMapper, e);
     } finally {
