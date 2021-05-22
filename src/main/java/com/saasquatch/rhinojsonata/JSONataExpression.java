@@ -114,7 +114,7 @@ public final class JSONataExpression {
     final NativeObject nativeObject = new NativeObject();
     for (Map.Entry<String, Object> binding : bindingsMap.entrySet()) {
       final String name = binding.getKey();
-      final Object bindingValue = Objects.requireNonNull(binding.getValue());
+      final Object bindingValue = binding.getValue();
       final Object bindingJsObject;
       if (bindingValue instanceof String) {
         bindingJsObject = cx.evaluateString(scope, (String) bindingValue, null, 1, null);
