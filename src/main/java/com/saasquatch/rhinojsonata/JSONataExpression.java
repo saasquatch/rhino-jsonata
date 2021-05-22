@@ -11,7 +11,6 @@ import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.saasquatch.rhinojsonata.annotations.Beta;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
