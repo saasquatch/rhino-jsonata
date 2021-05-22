@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -196,6 +197,31 @@ public class JSONataExpressionTests {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
       expression.registerFunction("foo", "a => a + a", "<s:s>");
       assertThrows(JSONataException.class, expression::evaluate);
+    }
+  }
+
+  @Test
+  public void testRegisterStatefulFunctions() {
+    {
+      final JSONataExpression expression = jsonata.parse("$foo()");
+      expression.registerFunction("foo", "var _counter = 0; () => _counter++;", null);
+      assertEquals(0, expression.evaluate().intValue());
+      assertEquals(1, expression.evaluate().intValue());
+      final JSONataExpression expression2 = jsonata.parse("$foo()");
+      expression2.registerFunction("foo", "var _counter = 0; () => _counter++;", null);
+      assertEquals(0, expression2.evaluate().intValue());
+      assertEquals(2, expression.evaluate().intValue());
+      assertEquals(1, expression2.evaluate().intValue());
+    }
+    {
+      final JSONataExpression expression = jsonata.parse("$string($foo()) & \" \" & $string($bar())");
+      expression.evaluateVoidJavaScript("var _counter = 100");
+      final JsonNode result = expression.evaluate(JsonNodeFactory.instance.missingNode(),
+          EvaluationBindings.newBuilder()
+              .put("foo", "() => _counter += 10;")
+              .put("bar", "() => _counter = Math.ceil(Math.sqrt(_counter));")
+              .build());
+      assertEquals("110 11", result.textValue());
     }
   }
 
