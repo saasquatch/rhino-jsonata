@@ -77,25 +77,25 @@ public final class JSONataExpression {
         prepEvaluationContext(evaluationCx);
         evaluateResult = ScriptableObject.callMethod(evaluationCx, expressionNativeObject, EVALUATE,
             new Object[]{inputJsObject, bindingsJsObject});
+      } catch (SquatchTimeoutError e) {
+        /*
+         * The error message comes from https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158
+         * It is licenced under MIT License
+         */
+        throw new JSONataException("Expression evaluation timeout: Check for infinite loop");
+      } catch (StackOverflowError e) {
+        /*
+         * The error message comes from https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158
+         * It is licenced under MIT License
+         */
+        throw new JSONataException("Stack overflow error: Check for non-terminating recursive "
+            + "function. Consider rewriting as tail-recursive.", e);
       } finally {
         Context.exit();
       }
       return jsObjectToJsonNode(cx, scope, objectMapper, evaluateResult);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, objectMapper, e);
-    } catch (SquatchTimeoutError e) {
-      /*
-       * The error message comes from https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158
-       * It is licenced under MIT License
-       */
-      throw new JSONataException("Expression evaluation timeout: Check for infinite loop");
-    } catch (StackOverflowError e) {
-      /*
-       * The error message comes from https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158
-       * It is licenced under MIT License
-       */
-      throw new JSONataException("Stack overflow error: Check for non-terminating recursive "
-          + "function. Consider rewriting as tail-recursive.", e);
     } finally {
       Context.exit();
     }
