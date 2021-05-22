@@ -11,6 +11,7 @@ import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.saasquatch.rhinojsonata.annotations.Beta;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -44,8 +45,8 @@ public final class JSONataExpression {
     this.objectMapper = jsonata.objectMapper;
     this.expressionNativeObject = expressionNativeObject;
     this.expressionOptions = expressionOptions;
-    // Every JSONataExpression gets its own scope so the original JSONata instance doesn't get
-    // contaminated
+    // Every JSONataExpression gets its own scope so the original and likely shared JSONata instance
+    // doesn't get contaminated
     this.scope = createScope(contextFactory);
   }
 
@@ -193,6 +194,25 @@ public final class JSONataExpression {
       ScriptableObject.callMethod(cx, expressionNativeObject, REGISTER_FUNCTION,
           new Object[]{name, cx.evaluateString(scope, jsFunctionExpression, null, 1, null),
               signature == null ? Undefined.instance : signature});
+    } catch (RhinoException e) {
+      rethrowRhinoException(cx, scope, objectMapper, e);
+    } finally {
+      Context.exit();
+    }
+  }
+
+  /**
+   * Evaluate the given JavaScript source code in the scope of this {@link JSONataExpression}. This
+   * is useful for setting up states for stateful functions to be registered with {@link
+   * JSONataExpression#registerFunction(String, String, String)} and {@link
+   * JSONataExpression#assign(String, String)}.
+   */
+  @Beta
+  public void evaluateVoidJavaScript(@Nonnull String jsSource) {
+    Objects.requireNonNull(jsSource);
+    final Context cx = contextFactory.enterContext();
+    try {
+      cx.evaluateString(scope, jsSource, null, 1, null);
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, objectMapper, e);
     } finally {
