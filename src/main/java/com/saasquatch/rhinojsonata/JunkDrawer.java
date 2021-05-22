@@ -144,6 +144,26 @@ final class JunkDrawer {
     }
   }
 
+  public static JsonNode jsObjectToJsonNode(@Nonnull Context cx, @Nonnull Scriptable scope,
+      @Nonnull ObjectMapper objectMapper, @Nullable Object jsObject) {
+    if (jsObject == null) {
+      return JsonNodeFactory.instance.nullNode();
+    } else if (jsObject instanceof Undefined) {
+      return JsonNodeFactory.instance.missingNode();
+    } else if (jsObject instanceof CharSequence) {
+      return JsonNodeFactory.instance.textNode(jsObject.toString());
+    } else if (jsObject instanceof Boolean) {
+      return JsonNodeFactory.instance.booleanNode((Boolean) jsObject);
+    }
+    // Not handling numbers separately because Rhino has some peculiar ways of dealing with numbers
+    try {
+      return objectMapper.readTree(NativeJSON.stringify(
+          cx, scope, jsObject, null, null).toString());
+    } catch (IOException e) {
+      throw new JSONataException(e.getMessage(), e);
+    }
+  }
+
   public static String readerToString(@Nonnull @WillNotClose Reader reader) throws IOException {
     final StringBuilder sb = new StringBuilder();
     final char[] buffer = new char[8192];

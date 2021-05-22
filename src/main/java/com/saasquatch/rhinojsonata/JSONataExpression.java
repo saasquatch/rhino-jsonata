@@ -3,19 +3,18 @@ package com.saasquatch.rhinojsonata;
 import static com.saasquatch.rhinojsonata.JunkDrawer.ASSIGN;
 import static com.saasquatch.rhinojsonata.JunkDrawer.EVALUATE;
 import static com.saasquatch.rhinojsonata.JunkDrawer.REGISTER_FUNCTION;
+import static com.saasquatch.rhinojsonata.JunkDrawer.jsObjectToJsonNode;
 import static com.saasquatch.rhinojsonata.JunkDrawer.jsonNodeToJs;
 import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import java.io.IOException;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
-import org.mozilla.javascript.NativeJSON;
 import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
@@ -57,10 +56,8 @@ public final class JSONataExpression {
    * Evaluate the compiled JSONata expression with the given input.
    */
   public JsonNode evaluate(@Nullable JsonNode input) {
-    // This does not need to be locked
     final Object jsObject = toJsObject(input);
     final Object evaluateResult;
-    // Create cx inside the lock so the correct start time is recorded
     final Context cx = contextFactory.enterContext();
     try {
       cx.setOptimizationLevel(-1); // No point in optimizing
@@ -99,17 +96,9 @@ public final class JSONataExpression {
   }
 
   private JsonNode toJsonNode(@Nullable Object jsObject) {
-    if (jsObject == null) {
-      return JsonNodeFactory.instance.nullNode();
-    } else if (jsObject instanceof Undefined) {
-      return JsonNodeFactory.instance.missingNode();
-    }
     final Context cx = contextFactory.enterContext();
     try {
-      return objectMapper.readTree(NativeJSON.stringify(
-          cx, scope, jsObject, null, null).toString());
-    } catch (IOException e) {
-      throw new JSONataException(e.getMessage(), e);
+      return jsObjectToJsonNode(cx, scope, objectMapper, jsObject);
     } finally {
       Context.exit();
     }
