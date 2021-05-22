@@ -24,10 +24,6 @@ public final class JSONataExpressionOptions {
     this.timeboxExpressionMaxDepth = timeboxExpressionMaxDepth;
   }
 
-  boolean isTimeboxExpressions() {
-    return timeboxExpressionTimeboxMillis > 0;
-  }
-
   public static Builder newBuilder() {
     return new Builder();
   }
