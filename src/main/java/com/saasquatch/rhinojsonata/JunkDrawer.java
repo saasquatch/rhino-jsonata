@@ -15,6 +15,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.WillNotClose;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.NativeJSON;
 import org.mozilla.javascript.RhinoException;
@@ -161,6 +162,15 @@ final class JunkDrawer {
           cx, scope, jsObject, null, null).toString());
     } catch (IOException e) {
       throw new JSONataException(e.getMessage(), e);
+    }
+  }
+
+  public static Scriptable createScope(ContextFactory contextFactory) {
+    final Context cx = contextFactory.enterContext();
+    try {
+      return cx.initSafeStandardObjects();
+    } finally {
+      Context.exit();
     }
   }
 

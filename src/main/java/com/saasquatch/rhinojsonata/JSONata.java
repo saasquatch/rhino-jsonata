@@ -2,6 +2,7 @@ package com.saasquatch.rhinojsonata;
 
 import static com.saasquatch.rhinojsonata.JunkDrawer.JSONATA;
 import static com.saasquatch.rhinojsonata.JunkDrawer.TIMEBOX_EXPRESSION_JS;
+import static com.saasquatch.rhinojsonata.JunkDrawer.createScope;
 import static com.saasquatch.rhinojsonata.JunkDrawer.loadDefaultJSONataSource;
 import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 
@@ -112,15 +113,6 @@ public final class JSONata {
       return new JSONata(contextFactory, scope, objectMapper);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, objectMapper, e);
-    } finally {
-      Context.exit();
-    }
-  }
-
-  private static Scriptable createScope(ContextFactory contextFactory) {
-    final Context cx = contextFactory.enterContext();
-    try {
-      return cx.initSafeStandardObjects();
     } finally {
       Context.exit();
     }
