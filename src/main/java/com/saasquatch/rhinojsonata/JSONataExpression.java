@@ -107,12 +107,12 @@ public final class JSONataExpression {
     squatchContext.timeoutNanos = expressionOptions.evaluateTimeoutNanos;
   }
 
-  private Object buildBindings(Context cx, @Nonnull Map<String, Object> bindings) {
-    if (bindings.isEmpty()) {
+  private Object buildBindings(Context cx, @Nonnull Map<String, Object> bindingsMap) {
+    if (bindingsMap.isEmpty()) {
       return Undefined.instance;
     }
     final NativeObject nativeObject = new NativeObject();
-    for (Map.Entry<String, Object> binding : bindings.entrySet()) {
+    for (Map.Entry<String, Object> binding : bindingsMap.entrySet()) {
       final String name = binding.getKey();
       final Object bindingValue = Objects.requireNonNull(binding.getValue());
       final Object bindingJsObject;
