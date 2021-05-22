@@ -86,9 +86,6 @@ public final class JSONataExpression {
     } finally {
       Context.exit();
     }
-    if (evaluateResult instanceof Undefined) {
-      return JsonNodeFactory.instance.missingNode();
-    }
     return toJsonNode(evaluateResult);
   }
 
@@ -102,6 +99,11 @@ public final class JSONataExpression {
   }
 
   private JsonNode toJsonNode(@Nullable Object jsObject) {
+    if (jsObject == null) {
+      return JsonNodeFactory.instance.nullNode();
+    } else if (jsObject instanceof Undefined) {
+      return JsonNodeFactory.instance.missingNode();
+    }
     final Context cx = contextFactory.enterContext();
     try {
       return objectMapper.readTree(NativeJSON.stringify(
