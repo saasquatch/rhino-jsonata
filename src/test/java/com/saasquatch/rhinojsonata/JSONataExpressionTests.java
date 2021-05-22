@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -52,7 +51,10 @@ public class JSONataExpressionTests {
   @Test
   public void testEvaluationOfDifferentTypes() {
     assertEquals(JsonNodeFactory.instance.missingNode(), jsonata.parse("$$").evaluate());
-    assertEquals(JsonNodeFactory.instance.nullNode(), jsonata.parse("$$").evaluate(null));
+    assertEquals(JsonNodeFactory.instance.missingNode(),
+        jsonata.parse("$$").evaluate(JsonNodeFactory.instance.missingNode()));
+    assertEquals(JsonNodeFactory.instance.nullNode(),
+        jsonata.parse("$$").evaluate(JsonNodeFactory.instance.nullNode()));
     assertEquals(JsonNodeFactory.instance.missingNode(),
         jsonata.parse("$$").evaluate(JsonNodeFactory.instance.missingNode()));
     assertEquals(JsonNodeFactory.instance.nullNode(),
@@ -74,14 +76,14 @@ public class JSONataExpressionTests {
   @Test
   public void testEvaluateWithBindings() {
     final JSONataExpression expression = jsonata.parse("$foo");
-    //noinspection ConstantConditions
-    assertThrows(NullPointerException.class, () -> expression.evaluate(null, null));
     assertEquals(JsonNodeFactory.instance.missingNode(),
-        expression.evaluate(null, EvaluationBindings.newBuilder().build()));
+        expression.evaluate(JsonNodeFactory.instance.nullNode(),
+            EvaluationBindings.newBuilder().build()));
     assertEquals(JsonNodeFactory.instance.numberNode(1),
-        expression.evaluate(null, EvaluationBindings.newBuilder().put("foo", "1").build()));
+        expression.evaluate(JsonNodeFactory.instance.nullNode(),
+            EvaluationBindings.newBuilder().put("foo", "1").build()));
     assertEquals(JsonNodeFactory.instance.numberNode(1), expression
-        .evaluate(null, EvaluationBindings.newBuilder()
+        .evaluate(JsonNodeFactory.instance.nullNode(), EvaluationBindings.newBuilder()
             .put("foo", JsonNodeFactory.instance.numberNode(1)).build()));
   }
 
@@ -89,42 +91,42 @@ public class JSONataExpressionTests {
   public void testAssignJsExpression() {
     {
       final JSONataExpression expression = jsonata.parse("$foo");
-      assertEquals(JsonNodeFactory.instance.missingNode(), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.missingNode(), expression.evaluate());
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo");
       expression.assign("foo", "1");
-      assertEquals(JsonNodeFactory.instance.numberNode(1), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.numberNode(1), expression.evaluate());
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo");
       expression.assign("foo", "'1'");
-      assertEquals(JsonNodeFactory.instance.textNode("1"), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.textNode("1"), expression.evaluate());
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo");
       expression.assign("foo", "null");
-      assertEquals(JsonNodeFactory.instance.nullNode(), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.nullNode(), expression.evaluate());
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo");
       expression.assign("foo", "undefined");
-      assertEquals(JsonNodeFactory.instance.missingNode(), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.missingNode(), expression.evaluate());
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo");
       expression.assign("foo", "a => a + a");
-      assertThrows(JSONataException.class, () -> expression.evaluate(null));
+      assertThrows(JSONataException.class, expression::evaluate);
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
       expression.assign("foo", "a => a + a");
-      assertEquals(JsonNodeFactory.instance.numberNode(2), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.numberNode(2), expression.evaluate());
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo('1')");
       expression.assign("foo", "a => a + a");
-      assertEquals(JsonNodeFactory.instance.textNode("11"), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.textNode("11"), expression.evaluate());
     }
   }
 
@@ -132,32 +134,27 @@ public class JSONataExpressionTests {
   public void testAssignJsonNode() {
     {
       final JSONataExpression expression = jsonata.parse("$foo");
-      assertEquals(JsonNodeFactory.instance.missingNode(), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.missingNode(), expression.evaluate());
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo");
       expression.assign("foo", JsonNodeFactory.instance.numberNode(1));
-      assertEquals(JsonNodeFactory.instance.numberNode(1), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.numberNode(1), expression.evaluate());
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo");
       expression.assign("foo", JsonNodeFactory.instance.textNode("1"));
-      assertEquals(JsonNodeFactory.instance.textNode("1"), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.textNode("1"), expression.evaluate());
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo");
       expression.assign("foo", JsonNodeFactory.instance.nullNode());
-      assertEquals(JsonNodeFactory.instance.nullNode(), expression.evaluate(null));
-    }
-    {
-      final JSONataExpression expression = jsonata.parse("$foo");
-      expression.assign("foo", (JsonNode) null);
-      assertEquals(JsonNodeFactory.instance.nullNode(), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.nullNode(), expression.evaluate());
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo");
       expression.assign("foo", JsonNodeFactory.instance.missingNode());
-      assertEquals(JsonNodeFactory.instance.missingNode(), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.missingNode(), expression.evaluate());
     }
   }
 
@@ -166,37 +163,37 @@ public class JSONataExpressionTests {
     {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
       expression.registerFunction("foo", "a => a + a", "<n:n>");
-      assertEquals(JsonNodeFactory.instance.numberNode(2), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.numberNode(2), expression.evaluate());
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
       expression.registerFunction("foo", "(function(a) {return a + a;})", "<n:n>");
-      assertEquals(JsonNodeFactory.instance.numberNode(2), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.numberNode(2), expression.evaluate());
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
       expression.registerFunction("foo", "function(a) {return a + a;}", "<n:n>");
-      assertThrows(JSONataException.class, () -> expression.evaluate(null));
+      assertThrows(JSONataException.class, expression::evaluate);
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
       expression.registerFunction("foo", "a => a + a", null);
-      assertEquals(JsonNodeFactory.instance.numberNode(2), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.numberNode(2), expression.evaluate());
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
       expression.registerFunction("foo", "(function(a) {return a + a;})", null);
-      assertEquals(JsonNodeFactory.instance.numberNode(2), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.numberNode(2), expression.evaluate());
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo(\"1\")");
       expression.registerFunction("foo", "a => a + a", "<s:s>");
-      assertEquals(JsonNodeFactory.instance.textNode("11"), expression.evaluate(null));
+      assertEquals(JsonNodeFactory.instance.textNode("11"), expression.evaluate());
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
       expression.registerFunction("foo", "a => a + a", "<s:s>");
-      assertThrows(JSONataException.class, () -> expression.evaluate(null));
+      assertThrows(JSONataException.class, expression::evaluate);
     }
   }
 

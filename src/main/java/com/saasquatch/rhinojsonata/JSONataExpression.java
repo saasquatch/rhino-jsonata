@@ -56,11 +56,13 @@ public final class JSONataExpression {
   /**
    * Evaluate the compiled JSONata expression with the given input.
    */
-  public JsonNode evaluate(@Nullable JsonNode input) {
+  public JsonNode evaluate(@Nonnull JsonNode input) {
     return evaluate(input, EvaluationBindings.EMPTY);
   }
 
-  public JsonNode evaluate(@Nullable JsonNode input, @Nonnull EvaluationBindings bindings) {
+  public JsonNode evaluate(@Nonnull JsonNode input, @Nonnull EvaluationBindings bindings) {
+    Objects.requireNonNull(input);
+    Objects.requireNonNull(bindings);
     final Context cx = contextFactory.enterContext();
     try {
       final Object inputJsObject = jsonNodeToJs(cx, scope, objectMapper, input);
@@ -148,8 +150,9 @@ public final class JSONataExpression {
   /**
    * Bind a value in the form of a {@link JsonNode} to a name in the expression.
    */
-  public void assign(@Nonnull String name, @Nullable JsonNode jsonNode) {
+  public void assign(@Nonnull String name, @Nonnull JsonNode jsonNode) {
     Objects.requireNonNull(name);
+    Objects.requireNonNull(jsonNode);
     final Context cx = contextFactory.enterContext();
     try {
       _assign(cx, name, jsonNodeToJs(cx, scope, objectMapper, jsonNode));
