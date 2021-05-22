@@ -201,23 +201,4 @@ public final class JSONataExpression {
     }
   }
 
-  /**
-   * Evaluate the given JavaScript source code in the scope of this {@link JSONataExpression}. This
-   * is useful for setting up states for stateful functions to be registered with {@link
-   * JSONataExpression#registerFunction(String, String, String)} and {@link
-   * JSONataExpression#assign(String, String)}.
-   */
-  @Beta
-  public void evaluateVoidJavaScript(@Nonnull String jsSource) {
-    Objects.requireNonNull(jsSource);
-    final Context cx = contextFactory.enterContext();
-    try {
-      cx.evaluateString(scope, jsSource, null, 1, null);
-    } catch (RhinoException e) {
-      rethrowRhinoException(cx, scope, objectMapper, e);
-    } finally {
-      Context.exit();
-    }
-  }
-
 }
