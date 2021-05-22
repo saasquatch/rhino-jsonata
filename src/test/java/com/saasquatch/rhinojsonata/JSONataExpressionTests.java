@@ -204,7 +204,7 @@ public class JSONataExpressionTests {
   public void testRegisterStatefulFunctions() {
     {
       final JSONataExpression expression = jsonata.parse("$foo()");
-      expression.registerFunction("foo", "var _counter = 0; () => _counter++;", null);
+      expression.registerFunction("foo", "var _counter = 0; () => _counter++", null);
       assertEquals(0, expression.evaluate().intValue());
       assertEquals(1, expression.evaluate().intValue());
       final JSONataExpression expression2 = jsonata.parse("$foo()");
@@ -222,6 +222,15 @@ public class JSONataExpressionTests {
               .put("bar", "() => _counter = Math.ceil(Math.sqrt(_counter));")
               .build());
       assertEquals("110 11", result.textValue());
+    }
+    {
+      final JSONataExpression expression = jsonata.parse("$foo()");
+      expression.registerFunction("foo", "var _counter = 0; () => _counter++", null);
+      assertEquals(0, expression.evaluate().intValue());
+      assertEquals(1, expression.evaluate().intValue());
+      expression.evaluateVoidJavaScript("_counter = 100");
+      assertEquals(100, expression.evaluate().intValue());
+      assertEquals(101, expression.evaluate().intValue());
     }
   }
 
