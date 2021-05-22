@@ -7,6 +7,11 @@ import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 
+/**
+ * Bindings for {@link JSONataExpression#evaluate(JsonNode, EvaluationBindings)}
+ *
+ * @author sli
+ */
 public final class EvaluationBindings {
 
   static final EvaluationBindings EMPTY = newBuilder().build();
@@ -27,13 +32,20 @@ public final class EvaluationBindings {
 
     private Builder() {}
 
+    /**
+     * Put a binding in the form of a JavaScript expression
+     */
     public Builder put(@Nonnull String name, @Nonnull String jsExpression) {
       bindingsMap.put(Objects.requireNonNull(name), Objects.requireNonNull(jsExpression));
       return this;
     }
 
+    /**
+     * Put a binding in the form of a {@link JsonNode}
+     */
     public Builder put(@Nonnull String name, @Nonnull JsonNode jsonNode) {
-      bindingsMap.put(Objects.requireNonNull(name), Objects.requireNonNull(jsonNode));
+      // deepCopy to ensure immutability
+      bindingsMap.put(Objects.requireNonNull(name), jsonNode.deepCopy());
       return this;
     }
 

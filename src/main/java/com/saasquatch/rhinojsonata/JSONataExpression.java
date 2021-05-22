@@ -60,6 +60,9 @@ public final class JSONataExpression {
     return evaluate(input, EvaluationBindings.EMPTY);
   }
 
+  /**
+   * Evaluate the compiled JSONata expression with the given input and bindings.
+   */
   public JsonNode evaluate(@Nonnull JsonNode input, @Nonnull EvaluationBindings bindings) {
     Objects.requireNonNull(input);
     Objects.requireNonNull(bindings);

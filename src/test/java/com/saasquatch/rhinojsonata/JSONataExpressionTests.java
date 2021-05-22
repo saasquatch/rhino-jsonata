@@ -85,6 +85,8 @@ public class JSONataExpressionTests {
     assertEquals(JsonNodeFactory.instance.numberNode(1), expression
         .evaluate(JsonNodeFactory.instance.nullNode(), EvaluationBindings.newBuilder()
             .put("foo", JsonNodeFactory.instance.numberNode(1)).build()));
+    assertEquals(JsonNodeFactory.instance.missingNode(), expression.evaluate(),
+        "Previous bindings should not have modified the expression");
   }
 
   @Test
