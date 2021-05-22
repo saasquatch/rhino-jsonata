@@ -51,9 +51,9 @@ public final class JSONataExpressionOptions {
     }
 
     /**
-     * Set a timeout and a max stack depth to protect against infinite loops. Note that the timeout
-     * and maxDepth are enforced within jsonata-js, not on the JS runtime level.<br>This method has
-     * a few caveats:
+     * Set a timeout and a max stack depth for {@link JSONataExpression#evaluate()} methods to
+     * protect against infinite loops. Note that the timeout and maxDepth are enforced within
+     * jsonata-js, not on the JS runtime level.<br>This method has a few caveats:
      * <ul>
      *   <li>This method relies on internal and potentially unstable APIs from jsonata-js, so it's
      *   possible that it won't work with a future version of jsonata-js.</li>
