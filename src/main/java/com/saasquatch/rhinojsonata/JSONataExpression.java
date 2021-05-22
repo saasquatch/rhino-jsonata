@@ -60,9 +60,7 @@ public final class JSONataExpression {
     final Object evaluateResult;
     final Context cx = contextFactory.enterContext();
     try {
-      cx.setOptimizationLevel(-1); // No point in optimizing
-      final SquatchContext squatchContext = (SquatchContext) cx;
-      squatchContext.timeoutNanos = expressionOptions.evaluateTimeoutNanos;
+      prepEvaluationContext(cx);
       evaluateResult = ScriptableObject.callMethod(cx, expressionNativeObject, EVALUATE,
           new Object[]{jsObject});
     } catch (RhinoException e) {
@@ -84,6 +82,12 @@ public final class JSONataExpression {
       Context.exit();
     }
     return toJsonNode(evaluateResult);
+  }
+
+  private void prepEvaluationContext(Context cx) {
+    cx.setOptimizationLevel(-1); // No point in optimizing
+    final SquatchContext squatchContext = (SquatchContext) cx;
+    squatchContext.timeoutNanos = expressionOptions.evaluateTimeoutNanos;
   }
 
   private Object toJsObject(@Nullable JsonNode input) {
