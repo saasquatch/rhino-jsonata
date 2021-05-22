@@ -10,7 +10,6 @@ import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -58,12 +57,12 @@ public final class JSONataExpression {
    * Evaluate the compiled JSONata expression with the given input.
    */
   public JsonNode evaluate(@Nullable JsonNode input) {
-    return evaluate(input, Collections.emptyMap());
+    return evaluate(input, EvaluationBindings.EMPTY);
   }
 
-  public JsonNode evaluate(@Nullable JsonNode input, @Nonnull Map<String, Object> bindings) {
+  public JsonNode evaluate(@Nullable JsonNode input, @Nonnull EvaluationBindings bindings) {
     final Object inputJsObject = toJsObject(input);
-    final Object bindingsJsObject = buildBindings(bindings);
+    final Object bindingsJsObject = buildBindings(bindings.bindingsMap);
     final Object evaluateResult;
     // Only the evaluate call and nothing else should be run in this context
     final Context cx = contextFactory.enterContext();
@@ -137,7 +136,7 @@ public final class JSONataExpression {
         } else if (bindingValue instanceof JsonNode) {
           bindingJsObject = jsonNodeToJs(cx, scope, objectMapper, (JsonNode) bindingValue);
         } else {
-          throw new JSONataException("Unrecognized binding type: " + bindingValue.getClass());
+          throw new AssertionError();
         }
         ScriptableObject.putProperty(nativeObject, name, bindingJsObject);
       }
