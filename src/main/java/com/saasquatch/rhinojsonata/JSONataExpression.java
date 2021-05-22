@@ -61,22 +61,23 @@ public final class JSONataExpression {
   }
 
   public JsonNode evaluate(@Nullable JsonNode input, @Nonnull EvaluationBindings bindings) {
-    final Object inputJsObject = toJsObject(input);
-    final Object bindingsJsObject = buildBindings(bindings.bindingsMap);
-    final Object evaluateResult;
-    // Only the evaluate call and nothing else should be run in this context
     final Context cx = contextFactory.enterContext();
     try {
-      prepEvaluationContext(cx);
-      evaluateResult = ScriptableObject.callMethod(cx, expressionNativeObject, EVALUATE,
-          new Object[]{inputJsObject, bindingsJsObject});
-    } catch (RhinoException e) {
-      final Context cx2 = contextFactory.enterContext();
+      final Object inputJsObject = jsonNodeToJs(cx, scope, objectMapper, input);
+      final Object bindingsJsObject = buildBindings(cx, bindings.bindingsMap);
+      final Object evaluateResult;
+      // Only the evaluate call and nothing else should be run in this context
+      final Context evaluationCx = contextFactory.enterContext();
       try {
-        return rethrowRhinoException(cx2, scope, objectMapper, e);
+        prepEvaluationContext(evaluationCx);
+        evaluateResult = ScriptableObject.callMethod(evaluationCx, expressionNativeObject, EVALUATE,
+            new Object[]{inputJsObject, bindingsJsObject});
       } finally {
         Context.exit();
       }
+      return jsObjectToJsonNode(cx, scope, objectMapper, evaluateResult);
+    } catch (RhinoException e) {
+      return rethrowRhinoException(cx, scope, objectMapper, e);
     } catch (SquatchTimeoutError e) {
       /*
        * The error message comes from https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158
@@ -93,7 +94,6 @@ public final class JSONataExpression {
     } finally {
       Context.exit();
     }
-    return toJsonNode(evaluateResult);
   }
 
   private void prepEvaluationContext(Context cx) {
@@ -102,48 +102,25 @@ public final class JSONataExpression {
     squatchContext.timeoutNanos = expressionOptions.evaluateTimeoutNanos;
   }
 
-  private Object toJsObject(@Nullable JsonNode input) {
-    final Context cx = contextFactory.enterContext();
-    try {
-      return jsonNodeToJs(cx, scope, objectMapper, input);
-    } finally {
-      Context.exit();
-    }
-  }
-
-  private JsonNode toJsonNode(@Nullable Object jsObject) {
-    final Context cx = contextFactory.enterContext();
-    try {
-      return jsObjectToJsonNode(cx, scope, objectMapper, jsObject);
-    } finally {
-      Context.exit();
-    }
-  }
-
-  private Object buildBindings(@Nonnull Map<String, Object> bindings) {
+  private Object buildBindings(Context cx, @Nonnull Map<String, Object> bindings) {
     if (bindings.isEmpty()) {
       return Undefined.instance;
     }
-    final Context cx = contextFactory.enterContext();
-    try {
-      final NativeObject nativeObject = new NativeObject();
-      for (Map.Entry<String, Object> binding : bindings.entrySet()) {
-        final String name = binding.getKey();
-        final Object bindingValue = Objects.requireNonNull(binding.getValue());
-        final Object bindingJsObject;
-        if (bindingValue instanceof String) {
-          bindingJsObject = cx.evaluateString(scope, (String) bindingValue, null, 1, null);
-        } else if (bindingValue instanceof JsonNode) {
-          bindingJsObject = jsonNodeToJs(cx, scope, objectMapper, (JsonNode) bindingValue);
-        } else {
-          throw new AssertionError();
-        }
-        ScriptableObject.putProperty(nativeObject, name, bindingJsObject);
+    final NativeObject nativeObject = new NativeObject();
+    for (Map.Entry<String, Object> binding : bindings.entrySet()) {
+      final String name = binding.getKey();
+      final Object bindingValue = Objects.requireNonNull(binding.getValue());
+      final Object bindingJsObject;
+      if (bindingValue instanceof String) {
+        bindingJsObject = cx.evaluateString(scope, (String) bindingValue, null, 1, null);
+      } else if (bindingValue instanceof JsonNode) {
+        bindingJsObject = jsonNodeToJs(cx, scope, objectMapper, (JsonNode) bindingValue);
+      } else {
+        throw new AssertionError();
       }
-      return nativeObject;
-    } finally {
-      Context.exit();
+      ScriptableObject.putProperty(nativeObject, name, bindingJsObject);
     }
+    return nativeObject;
   }
 
   /**
