@@ -180,7 +180,7 @@ final class JunkDrawer {
         Reader jsonataSourceReader = new InputStreamReader(
             Objects.requireNonNull(jsonataSourceStream), UTF_8)
     ) {
-      return readerToString(Objects.requireNonNull(jsonataSourceReader));
+      return readerToString(jsonataSourceReader);
     } catch (IOException e) {
       throw new JSONataException(e.getMessage(), e);
     }
