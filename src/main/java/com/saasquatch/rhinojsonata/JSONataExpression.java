@@ -68,6 +68,7 @@ public final class JSONataExpression {
     Objects.requireNonNull(bindings);
     final Context cx = contextFactory.enterContext();
     try {
+      cx.setOptimizationLevel(-1);
       final Object inputJsObject = jsonNodeToJs(cx, scope, objectMapper, input);
       final Object bindingsJsObject = buildBindings(cx, bindings.bindingsMap);
       final Object evaluateResult;
