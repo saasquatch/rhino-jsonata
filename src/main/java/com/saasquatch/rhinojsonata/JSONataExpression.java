@@ -173,10 +173,10 @@ public final class JSONataExpression {
 
   /**
    * Bind a JavaScript function to a name in the expression.<br>Note that the JS function string has
-   * to be a JS expression whose value is a function, which is to say that {@code "a => a"} and
-   * {@code "(function(a) {return a;})"} work, but {@code "function(a) {return a;}"} and {@code
-   * "function foo(a) {return a;}"} do not work. Also, depending on the nature of the JS function,
-   * it may make the {@link #evaluate()} methods not thread safe.
+   * to be a JS expression that strictly evaluates to a function, which is to say that {@code "a =>
+   * a"} and {@code "(function(a) {return a;})"} work, but {@code "function(a) {return a;}"} and
+   * {@code "function foo(a) {return a;}"} do not work. Also, depending on the nature of the JS
+   * function, it may make the {@link #evaluate()} methods not thread safe.
    *
    * @param signature The JSONata function signature.
    *                  <a href="https://docs.jsonata.org/embedding-extending#function-signature-syntax">
