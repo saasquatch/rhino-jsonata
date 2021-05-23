@@ -29,9 +29,15 @@ System.out.println(objectMapper.writeValueAsString(result)); // prints 24
 
 For documentation on JSONata itself, please refer to the official [JSONata docs](https://docs.jsonata.org).
 
-## Limitations
+## Current limitations
 
-TODO
+- The async version of `evaluate` [with a callback](https://docs.jsonata.org/embedding-extending#expressionevaluateinput-bindings-callback) is not supported.
+- Only JavaScript functions as strings can be registered with `assign` or `registerFunction`. Java functions are not supported.
+- A lot of ES6 features, including but not limited to generator functions, async/await, and template literals, are not supported.
+- When registering a function, the JS expression must strictly evaluates to a function, which is to say expressions like `(function(a) {return a;})` and `a => a` work, but `function(a) {return a;}` and `function foo(a) {return a;}` do not work.
+- Registering stateful functions can make the `evaluate` methods not thread safe.
+
+This is not meant to be a comprehensive list.
 
 ## Adding it to your project
 
@@ -76,7 +82,7 @@ implementation 'com.github.saasquatch:rhino-jsonata:0.0.1'
 
 ### Transitive Dependencies
 
-This project requires Java 8. The only required transitive dependencies are [Rhino](https://github.com/mozilla/rhino), [Jackson](https://github.com/FasterXML/jackson), and [FindBugs (JSR305)](http://findbugs.sourceforge.net/).
+This project requires Java 8. The only transitive dependencies are [Rhino](https://github.com/mozilla/rhino), [Jackson](https://github.com/FasterXML/jackson), and [FindBugs (JSR305)](http://findbugs.sourceforge.net/).
 
 ### Unstable APIs
 
