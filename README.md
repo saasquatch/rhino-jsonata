@@ -1,8 +1,8 @@
 # rhino-jsonata
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![JavaCI](https://github.com/saasquatch/rhino-jsonata/actions/workflows/JavaCI.yml/badge.svg)](https://github.com/saasquatch/rhino-jsonata/actions/workflows/JavaCI.yml)
-[![Validate Gradle Wrapper](https://github.com/saasquatch/rhino-jsonata/actions/workflows/ValidateGradleWrapper.yml/badge.svg)](https://github.com/saasquatch/rhino-jsonata/actions/workflows/ValidateGradleWrapper.yml)
+[![JavaCI](https://github.com/saasquatch/rhino-jsonata/actions/workflows/JavaCI.yml/badge.svg?branch=master)](https://github.com/saasquatch/rhino-jsonata/actions/workflows/JavaCI.yml)
+[![Validate Gradle Wrapper](https://github.com/saasquatch/rhino-jsonata/actions/workflows/ValidateGradleWrapper.yml/badge.svg?branch=master)](https://github.com/saasquatch/rhino-jsonata/actions/workflows/ValidateGradleWrapper.yml)
 [![](https://jitpack.io/v/saasquatch/rhino-jsonata.svg)](https://jitpack.io/#saasquatch/rhino-jsonata)
 
 ## Introduction
