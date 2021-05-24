@@ -10,6 +10,8 @@ import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -55,6 +57,9 @@ public final class JSONataExpression {
 
   /**
    * Evaluate the compiled JSONata expression with the given input.
+   *
+   * @param input The JSON input. Java {@code null} is not allowed. Use {@link NullNode} for {@code
+   *              null} or {@link MissingNode} for {@code undefined}.
    */
   public JsonNode evaluate(@Nonnull JsonNode input) {
     return evaluate(input, EvaluationBindings.EMPTY);
@@ -62,6 +67,9 @@ public final class JSONataExpression {
 
   /**
    * Evaluate the compiled JSONata expression with the given input and bindings.
+   *
+   * @param input The JSON input. Java {@code null} is not allowed. Use {@link NullNode} for {@code
+   *              null} or {@link MissingNode} for {@code undefined}.
    */
   public JsonNode evaluate(@Nonnull JsonNode input, @Nonnull EvaluationBindings bindings) {
     Objects.requireNonNull(input);
@@ -153,13 +161,17 @@ public final class JSONataExpression {
 
   /**
    * Bind a value in the form of a {@link JsonNode} to a name in the expression.
+   *
+   * @param jsonValue The value in the form of a {@link JsonNode}. Java {@code null} is not allowed.
+   *                  Use {@link NullNode} for {@code null} or {@link MissingNode} for {@code
+   *                  undefined}.
    */
-  public void assign(@Nonnull String name, @Nonnull JsonNode jsonNode) {
+  public void assign(@Nonnull String name, @Nonnull JsonNode jsonValue) {
     Objects.requireNonNull(name);
-    Objects.requireNonNull(jsonNode);
+    Objects.requireNonNull(jsonValue);
     final Context cx = contextFactory.enterContext();
     try {
-      _assign(cx, name, jsonNodeToJs(cx, scope, objectMapper, jsonNode));
+      _assign(cx, name, jsonNodeToJs(cx, scope, objectMapper, jsonValue));
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, objectMapper, e);
     } finally {

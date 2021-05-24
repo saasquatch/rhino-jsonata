@@ -1,6 +1,8 @@
 package com.saasquatch.rhinojsonata;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,10 +44,14 @@ public final class EvaluationBindings {
 
     /**
      * Put a binding in the form of a {@link JsonNode}
+     *
+     * @param jsonValue The value in the form of a {@link JsonNode}. Java {@code null} is not
+     *                  allowed. Use {@link NullNode} for {@code null} or {@link MissingNode} for
+     *                  {@code undefined}.
      */
-    public Builder put(@Nonnull String name, @Nonnull JsonNode jsonNode) {
+    public Builder put(@Nonnull String name, @Nonnull JsonNode jsonValue) {
       // deepCopy to ensure immutability
-      bindingsMap.put(Objects.requireNonNull(name), jsonNode.deepCopy());
+      bindingsMap.put(Objects.requireNonNull(name), jsonValue.deepCopy());
       return this;
     }
 
