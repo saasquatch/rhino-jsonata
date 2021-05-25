@@ -121,9 +121,7 @@ public final class JSONataExpression {
       return Undefined.instance;
     }
     final Scriptable nativeObject = cx.newObject(scope);
-    for (Map.Entry<String, Object> binding : bindingsMap.entrySet()) {
-      final String name = binding.getKey();
-      final Object bindingValue = binding.getValue();
+    bindingsMap.forEach((name, bindingValue) -> {
       final Object bindingJsObject;
       if (bindingValue instanceof String) {
         bindingJsObject = cx.evaluateString(scope, (String) bindingValue, null, 1, null);
@@ -133,7 +131,7 @@ public final class JSONataExpression {
         throw new AssertionError();
       }
       ScriptableObject.putProperty(nativeObject, name, bindingJsObject);
-    }
+    });
     return nativeObject;
   }
 
