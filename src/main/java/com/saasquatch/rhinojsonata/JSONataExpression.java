@@ -120,7 +120,7 @@ public final class JSONataExpression {
     if (bindingsMap.isEmpty()) {
       return Undefined.instance;
     }
-    final NativeObject nativeObject = new NativeObject();
+    final Scriptable nativeObject = cx.newObject(scope);
     for (Map.Entry<String, Object> binding : bindingsMap.entrySet()) {
       final String name = binding.getKey();
       final Object bindingValue = binding.getValue();
