@@ -18,7 +18,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
-import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -35,11 +34,11 @@ public final class JSONataExpression {
 
   private final ContextFactory contextFactory;
   private final ObjectMapper objectMapper;
-  private final NativeObject expressionNativeObject;
+  private final Scriptable expressionNativeObject;
   private final Scriptable scope;
   private final JSONataExpressionOptions expressionOptions;
 
-  JSONataExpression(@Nonnull JSONata jsonata, @Nonnull NativeObject expressionNativeObject,
+  JSONataExpression(@Nonnull JSONata jsonata, @Nonnull Scriptable expressionNativeObject,
       @Nonnull Scriptable scope, @Nonnull JSONataExpressionOptions expressionOptions) {
     this.contextFactory = jsonata.contextFactory;
     this.objectMapper = jsonata.objectMapper;

@@ -12,7 +12,6 @@ import javax.annotation.Nonnull;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
-import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -60,7 +59,7 @@ public final class JSONata {
     final Context cx = contextFactory.enterContext();
     try {
       cx.setOptimizationLevel(-1); // No point in optimizing
-      final NativeObject expressionNativeObject = (NativeObject) ScriptableObject.callMethod(
+      final Scriptable expressionNativeObject = (Scriptable) ScriptableObject.callMethod(
           cx, scope, JSONATA, new Object[]{expression});
       if (expressionOptions.timeboxExpressionTimeboxMillis > 0) {
         getTimeboxExpressionFunction().call(cx, scope, scope,
