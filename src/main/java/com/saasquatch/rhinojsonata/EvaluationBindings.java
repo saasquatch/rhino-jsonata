@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
  * Bindings for {@link JSONataExpression#evaluate(JsonNode, EvaluationBindings)}
  *
  * @author sli
+ * @see #newBuilder()
  */
 public final class EvaluationBindings {
 
