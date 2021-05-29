@@ -40,8 +40,7 @@ public final class JSONataExpressionOptions {
     private int timeboxExpressionMaxDepth;
     private Scriptable scope;
 
-    private Builder() {
-    }
+    private Builder() {}
 
     /**
      * Set a timeout for {@link JSONataExpression#evaluate()} methods to protect against infinite
