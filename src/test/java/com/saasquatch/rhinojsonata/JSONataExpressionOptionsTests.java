@@ -1,6 +1,7 @@
 package com.saasquatch.rhinojsonata;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -8,6 +9,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 
 public class JSONataExpressionOptionsTests {
 
@@ -18,10 +22,10 @@ public class JSONataExpressionOptionsTests {
     jsonata = JSONata.create();
   }
 
-  @SuppressWarnings("ConstantConditions")
   @Test
   public void testValidation() {
     final JSONataExpressionOptions.Builder builder = JSONataExpressionOptions.newBuilder();
+    //noinspection ConstantConditions
     assertThrows(NullPointerException.class, () -> builder.setEvaluateTimeout(null));
     assertThrows(IllegalArgumentException.class, () -> builder.setEvaluateTimeout(Duration.ZERO));
     assertThrows(IllegalArgumentException.class,
@@ -85,6 +89,26 @@ public class JSONataExpressionOptionsTests {
       } catch (JSONataException e) {
         assertTrue(e.getMessage().contains("Stack overflow"));
       }
+    }
+  }
+
+  @Test
+  public void testCustomScope() {
+    final Context cx = SquatchContextFactory.INSTANCE.enterContext();
+    try {
+      final Scriptable sharedScope = cx.initStandardObjects();
+      ScriptableObject.putProperty(sharedScope, "foo", 123);
+      final JSONataExpression ex1 = jsonata.parse("$f1()",
+          JSONataExpressionOptions.newBuilder().setScope(sharedScope).build());
+      ex1.registerFunction("f1", "() => ++foo", null);
+      final JSONataExpression ex2 = jsonata.parse("$f1()",
+          JSONataExpressionOptions.newBuilder().setScope(sharedScope).build());
+      ex2.registerFunction("f1", "() => ++foo", null);
+      assertEquals(124, ex1.evaluate().intValue());
+      assertEquals(125, ex2.evaluate().intValue());
+      assertEquals(126, ex1.evaluate().intValue());
+    } finally {
+      Context.exit();
     }
   }
 
