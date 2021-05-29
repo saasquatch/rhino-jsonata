@@ -3,7 +3,6 @@ package com.saasquatch.rhinojsonata;
 import com.saasquatch.rhinojsonata.annotations.Beta;
 import java.time.Duration;
 import java.util.Objects;
-import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import org.mozilla.javascript.Scriptable;
 
@@ -19,14 +18,14 @@ public final class JSONataExpressionOptions {
   final long evaluateTimeoutNanos;
   final int timeboxExpressionTimeboxMillis;
   final int timeboxExpressionMaxDepth;
-  final Supplier<Scriptable> scopeSupplier;
+  final Scriptable scope;
 
   private JSONataExpressionOptions(long evaluateTimeoutNanos, int timeboxExpressionTimeboxMillis,
-      int timeboxExpressionMaxDepth, Supplier<Scriptable> scopeSupplier) {
+      int timeboxExpressionMaxDepth, Scriptable scope) {
     this.evaluateTimeoutNanos = evaluateTimeoutNanos;
     this.timeboxExpressionTimeboxMillis = timeboxExpressionTimeboxMillis;
     this.timeboxExpressionMaxDepth = timeboxExpressionMaxDepth;
-    this.scopeSupplier = scopeSupplier;
+    this.scope = scope;
   }
 
   public static Builder newBuilder() {
@@ -38,7 +37,7 @@ public final class JSONataExpressionOptions {
     private long evaluateTimeoutNanos;
     private int timeboxExpressionTimeboxMillis;
     private int timeboxExpressionMaxDepth;
-    private Supplier<Scriptable> scopeSupplier;
+    private Scriptable scope;
 
     private Builder() {}
 
@@ -81,15 +80,18 @@ public final class JSONataExpressionOptions {
       return this;
     }
 
+    /**
+     * Set the Rhino scope for
+     */
     @Beta
-    public Builder setScopeSupplier(@Nonnull Supplier<Scriptable> scopeSupplier) {
-      this.scopeSupplier = Objects.requireNonNull(scopeSupplier);
+    public Builder setScope(@Nonnull Scriptable scope) {
+      this.scope = Objects.requireNonNull(scope);
       return this;
     }
 
     public JSONataExpressionOptions build() {
       return new JSONataExpressionOptions(evaluateTimeoutNanos, timeboxExpressionTimeboxMillis,
-          timeboxExpressionMaxDepth, scopeSupplier);
+          timeboxExpressionMaxDepth, scope);
     }
 
   }
