@@ -9,7 +9,8 @@ final class SquatchContext extends Context {
 
   /**
    * ONLY to be set by {@link SquatchContextFactory#doTopCall(Callable, Context, Scriptable,
-   * Scriptable, Object[])}
+   * Scriptable, Object[])}. The example provided by Rhino uses {@link System#currentTimeMillis()},
+   * but {@link System#nanoTime()} is better for obvious reasons.
    */
   long startTimeNanos;
   /**
