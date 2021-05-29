@@ -4,6 +4,7 @@ import com.saasquatch.rhinojsonata.annotations.Beta;
 import java.time.Duration;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
 /**
@@ -81,7 +82,12 @@ public final class JSONataExpressionOptions {
     }
 
     /**
-     * Set the Rhino scope for
+     * Set the Rhino scope for the {@link JSONataExpression}. By default, every {@link
+     * JSONataExpression} gets its own scope with {@link Context#initSafeStandardObjects()}. If
+     * having a shared scope across all {@link JSONataExpression}s is desired, then a separate scope
+     * can be created and passed in here. If you want the {@link JSONataExpression} to have access
+     * to Java classes, use {@link Context#initStandardObjects()}. This method can also be useful
+     * for preloading JavaScript libraries for the expression to use.
      */
     @Beta
     public Builder setScope(@Nonnull Scriptable scope) {
