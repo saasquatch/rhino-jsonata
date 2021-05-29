@@ -12,6 +12,7 @@ final class SquatchContextFactory extends ContextFactory {
   @Override
   protected Context makeContext() {
     final SquatchContext squatchContext = new SquatchContext(this);
+    // Set it to 10000 because the example provided by Rhino is 10000
     squatchContext.setInstructionObserverThreshold(10000);
     return squatchContext;
   }
@@ -19,10 +20,11 @@ final class SquatchContextFactory extends ContextFactory {
   @Override
   protected void observeInstructionCount(Context cx, int instructionCount) {
     final SquatchContext squatchContext = (SquatchContext) cx;
+    // Only enforce the timeout when timeoutNanos is positive
     if (squatchContext.timeoutNanos > 0) {
       final long elapsedNanos = System.nanoTime() - squatchContext.startTimeNanos;
       if (elapsedNanos < 0 || elapsedNanos >= squatchContext.timeoutNanos) {
-        // This has to an Error instead of an Exception
+        // This has to an Error instead of an Exception so it cannot be caught in JS land
         throw new SquatchTimeoutError();
       }
     }
