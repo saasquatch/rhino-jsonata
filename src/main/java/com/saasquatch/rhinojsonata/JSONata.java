@@ -70,12 +70,21 @@ public final class JSONata {
        * Every JSONataExpression gets its own scope so the original and likely shared JSONata
        * instance doesn't get contaminated
        */
-      return new JSONataExpression(this, expressionNativeObject, createScope(contextFactory),
-          expressionOptions);
+      return new JSONataExpression(this, expressionNativeObject,
+          createExpressionScope(contextFactory, expressionOptions), expressionOptions);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, objectMapper, e);
     } finally {
       Context.exit();
+    }
+  }
+
+  private Scriptable createExpressionScope(@Nonnull ContextFactory contextFactory,
+      @Nonnull JSONataExpressionOptions expressionOptions) {
+    if (expressionOptions.scopeSupplier == null) {
+      return createScope(contextFactory);
+    } else {
+      return expressionOptions.scopeSupplier.get();
     }
   }
 

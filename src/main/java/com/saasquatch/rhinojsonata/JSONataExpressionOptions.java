@@ -2,7 +2,10 @@ package com.saasquatch.rhinojsonata;
 
 import com.saasquatch.rhinojsonata.annotations.Beta;
 import java.time.Duration;
+import java.util.Objects;
+import java.util.function.Supplier;
 import javax.annotation.Nonnull;
+import org.mozilla.javascript.Scriptable;
 
 /**
  * Options for {@link JSONataExpression}
@@ -16,12 +19,14 @@ public final class JSONataExpressionOptions {
   final long evaluateTimeoutNanos;
   final int timeboxExpressionTimeboxMillis;
   final int timeboxExpressionMaxDepth;
+  final Supplier<Scriptable> scopeSupplier;
 
   private JSONataExpressionOptions(long evaluateTimeoutNanos, int timeboxExpressionTimeboxMillis,
-      int timeboxExpressionMaxDepth) {
+      int timeboxExpressionMaxDepth, Supplier<Scriptable> scopeSupplier) {
     this.evaluateTimeoutNanos = evaluateTimeoutNanos;
     this.timeboxExpressionTimeboxMillis = timeboxExpressionTimeboxMillis;
     this.timeboxExpressionMaxDepth = timeboxExpressionMaxDepth;
+    this.scopeSupplier = scopeSupplier;
   }
 
   public static Builder newBuilder() {
@@ -33,6 +38,7 @@ public final class JSONataExpressionOptions {
     private long evaluateTimeoutNanos;
     private int timeboxExpressionTimeboxMillis;
     private int timeboxExpressionMaxDepth;
+    private Supplier<Scriptable> scopeSupplier;
 
     private Builder() {}
 
@@ -75,9 +81,15 @@ public final class JSONataExpressionOptions {
       return this;
     }
 
+    @Beta
+    public Builder setScopeSupplier(@Nonnull Supplier<Scriptable> scopeSupplier) {
+      this.scopeSupplier = Objects.requireNonNull(scopeSupplier);
+      return this;
+    }
+
     public JSONataExpressionOptions build() {
       return new JSONataExpressionOptions(evaluateTimeoutNanos, timeboxExpressionTimeboxMillis,
-          timeboxExpressionMaxDepth);
+          timeboxExpressionMaxDepth, scopeSupplier);
     }
 
   }
