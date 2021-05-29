@@ -84,7 +84,7 @@ public final class JSONata {
     if (expressionOptions.scopeSupplier == null) {
       return createScope(contextFactory);
     } else {
-      return expressionOptions.scopeSupplier.get();
+      return Objects.requireNonNull(expressionOptions.scopeSupplier.get());
     }
   }
 
