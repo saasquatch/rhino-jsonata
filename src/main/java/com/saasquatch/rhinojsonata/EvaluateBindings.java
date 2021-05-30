@@ -10,18 +10,18 @@ import java.util.Objects;
 import javax.annotation.Nonnull;
 
 /**
- * Bindings for {@link JSONataExpression#evaluate(JsonNode, EvaluationBindings)}
+ * Bindings for {@link JSONataExpression#evaluate(JsonNode, EvaluateBindings)}
  *
  * @author sli
  * @see #newBuilder()
  */
-public final class EvaluationBindings {
+public final class EvaluateBindings {
 
-  static final EvaluationBindings EMPTY = newBuilder().build();
+  static final EvaluateBindings EMPTY = newBuilder().build();
 
   final Map<String, Object> bindingsMap;
 
-  private EvaluationBindings(Map<String, Object> bindingsMap) {
+  private EvaluateBindings(Map<String, Object> bindingsMap) {
     this.bindingsMap = bindingsMap;
   }
 
@@ -56,8 +56,8 @@ public final class EvaluationBindings {
       return this;
     }
 
-    public EvaluationBindings build() {
-      return new EvaluationBindings(Collections.unmodifiableMap(new HashMap<>(bindingsMap)));
+    public EvaluateBindings build() {
+      return new EvaluateBindings(Collections.unmodifiableMap(new HashMap<>(bindingsMap)));
     }
 
   }

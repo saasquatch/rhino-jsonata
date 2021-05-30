@@ -61,7 +61,7 @@ public final class JSONataExpression {
    *              null} or {@link MissingNode} for {@code undefined}.
    */
   public JsonNode evaluate(@Nonnull JsonNode input) {
-    return evaluate(input, EvaluationBindings.EMPTY);
+    return evaluate(input, EvaluateBindings.EMPTY);
   }
 
   /**
@@ -70,7 +70,7 @@ public final class JSONataExpression {
    * @param input The JSON input. Java {@code null} is not allowed. Use {@link NullNode} for {@code
    *              null} or {@link MissingNode} for {@code undefined}.
    */
-  public JsonNode evaluate(@Nonnull JsonNode input, @Nonnull EvaluationBindings bindings) {
+  public JsonNode evaluate(@Nonnull JsonNode input, @Nonnull EvaluateBindings bindings) {
     Objects.requireNonNull(input);
     Objects.requireNonNull(bindings);
     final Context cx = contextFactory.enterContext();
