@@ -3,7 +3,6 @@ package com.saasquatch.rhinojsonata;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
@@ -28,12 +27,9 @@ public class LuxonBindingTests {
   public void test() throws Exception {
     final Scriptable scope;
     final Context cx = new ContextFactory().enterContext();
-    try (
-        InputStream luxonInputStream = new URL(LUXON_JS_URL).openStream();
-        Reader luxonReader = new InputStreamReader(luxonInputStream, UTF_8)
-    ) {
+    try (Reader luxonReader = new InputStreamReader(new URL(LUXON_JS_URL).openStream(), UTF_8)) {
       scope = cx.initSafeStandardObjects();
-      cx.evaluateReader(scope, luxonReader, "luxon.min.js", 1, null);
+      cx.evaluateReader(scope, luxonReader, null, 1, null);
       cx.evaluateString(scope, ""
           + "function getProperties(clazz) {\n"
           + "  return Object.getOwnPropertyNames(clazz)\n"
