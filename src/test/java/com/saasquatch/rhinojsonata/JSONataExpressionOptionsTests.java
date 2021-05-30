@@ -112,4 +112,20 @@ public class JSONataExpressionOptionsTests {
     }
   }
 
+  @Test
+  public void testCustomScopeWithJavaAccess() {
+    final Context cx = SquatchContextFactory.INSTANCE.enterContext();
+    try {
+      final Scriptable sharedScope = cx.initStandardObjects();
+      final JSONataExpression ex1 = jsonata.parse("$foo");
+      assertThrows(JSONataException.class, () -> ex1.assign("foo", "java.lang.Short.MAX_VALUE"));
+      final JSONataExpression ex2 = jsonata.parse("$foo",
+          JSONataExpressionOptions.newBuilder().setScope(sharedScope).build());
+      ex2.assign("foo", "java.lang.Short.MAX_VALUE");
+      assertEquals(Short.MAX_VALUE, ex2.evaluate().intValue());
+    } finally {
+      Context.exit();
+    }
+  }
+
 }
