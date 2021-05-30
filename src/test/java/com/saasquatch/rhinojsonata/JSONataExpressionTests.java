@@ -78,12 +78,12 @@ public class JSONataExpressionTests {
     final JSONataExpression expression = jsonata.parse("$foo");
     assertEquals(JsonNodeFactory.instance.missingNode(),
         expression.evaluate(JsonNodeFactory.instance.nullNode(),
-            EvaluationBindings.newBuilder().build()));
+            EvaluateBindings.newBuilder().build()));
     assertEquals(JsonNodeFactory.instance.numberNode(1),
         expression.evaluate(JsonNodeFactory.instance.nullNode(),
-            EvaluationBindings.newBuilder().put("foo", "1").build()));
+            EvaluateBindings.newBuilder().put("foo", "1").build()));
     assertEquals(JsonNodeFactory.instance.numberNode(1), expression
-        .evaluate(JsonNodeFactory.instance.nullNode(), EvaluationBindings.newBuilder()
+        .evaluate(JsonNodeFactory.instance.nullNode(), EvaluateBindings.newBuilder()
             .put("foo", JsonNodeFactory.instance.numberNode(1)).build()));
     assertEquals(JsonNodeFactory.instance.missingNode(), expression.evaluate(),
         "Previous bindings should not have modified the expression");
