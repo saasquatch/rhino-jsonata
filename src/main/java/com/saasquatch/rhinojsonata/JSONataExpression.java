@@ -3,7 +3,7 @@ package com.saasquatch.rhinojsonata;
 import static com.saasquatch.rhinojsonata.JunkDrawer.ASSIGN;
 import static com.saasquatch.rhinojsonata.JunkDrawer.EVALUATE;
 import static com.saasquatch.rhinojsonata.JunkDrawer.REGISTER_FUNCTION;
-import static com.saasquatch.rhinojsonata.JunkDrawer.jsObjectToJsonNode;
+import static com.saasquatch.rhinojsonata.JunkDrawer.jsToJsonNode;
 import static com.saasquatch.rhinojsonata.JunkDrawer.jsonNodeToJs;
 import static com.saasquatch.rhinojsonata.JunkDrawer.rethrowRhinoException;
 
@@ -101,7 +101,7 @@ public final class JSONataExpression {
       } finally {
         Context.exit();
       }
-      return jsObjectToJsonNode(cx, scope, objectMapper, evaluateResult);
+      return jsToJsonNode(cx, scope, objectMapper, evaluateResult);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, objectMapper, e);
     } finally {

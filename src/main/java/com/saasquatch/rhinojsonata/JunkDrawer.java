@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Objects;
@@ -76,6 +75,13 @@ final class JunkDrawer {
 
   private JunkDrawer() {}
 
+  /**
+   * Turn a {@link RhinoException} into a {@link JSONataException} and throw it with a meaningful
+   * message. It handles things like {@code throw { foo: "bar" }} in JavaScript, which will result
+   * in a {@link RhinoException} with message {@code "[Object object]"}.
+   *
+   * @return Nothing. Always throws.
+   */
   public static <T> T rethrowRhinoException(@Nonnull Context cx, @Nonnull Scriptable scope,
       @Nonnull ObjectMapper objectMapper, @Nonnull RhinoException e) {
     if (e instanceof JavaScriptException) {
@@ -120,6 +126,9 @@ final class JunkDrawer {
     }
   }
 
+  /**
+   * Convert a {@link JsonNode} into an object that's recognizable by Rhino.
+   */
   public static Object jsonNodeToJs(@Nonnull Context cx, @Nonnull Scriptable scope,
       @Nonnull ObjectMapper objectMapper, @Nullable JsonNode jsonNode) {
     if (jsonNode == null) {
@@ -145,7 +154,10 @@ final class JunkDrawer {
     }
   }
 
-  public static JsonNode jsObjectToJsonNode(@Nonnull Context cx, @Nonnull Scriptable scope,
+  /**
+   * Convert a Rhino object into a {@link JsonNode}.
+   */
+  public static JsonNode jsToJsonNode(@Nonnull Context cx, @Nonnull Scriptable scope,
       @Nonnull ObjectMapper objectMapper, @Nullable Object jsObject) {
     if (jsObject == null) {
       return JsonNodeFactory.instance.nullNode();
@@ -174,6 +186,9 @@ final class JunkDrawer {
     }
   }
 
+  /**
+   * Read a {@link Reader} fully into a {@link String}.
+   */
   public static String readerToString(@Nonnull @WillNotClose Reader reader) throws IOException {
     final StringBuilder sb = new StringBuilder();
     final char[] buffer = new char[8192];
@@ -185,11 +200,8 @@ final class JunkDrawer {
   }
 
   public static String loadDefaultJSONataSource() {
-    try (
-        InputStream jsonataSourceStream = JSONata.class.getResourceAsStream("jsonata-es5.min.js");
-        Reader jsonataSourceReader = new InputStreamReader(
-            Objects.requireNonNull(jsonataSourceStream), UTF_8)
-    ) {
+    try (Reader jsonataSourceReader = new InputStreamReader(
+        Objects.requireNonNull(JSONata.class.getResourceAsStream("jsonata-es5.min.js")), UTF_8)) {
       return readerToString(jsonataSourceReader);
     } catch (IOException e) {
       throw new JSONataException(e.getMessage(), e);
