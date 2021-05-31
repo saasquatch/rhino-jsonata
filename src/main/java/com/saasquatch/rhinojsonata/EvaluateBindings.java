@@ -60,7 +60,7 @@ public final class EvaluateBindings {
      * Put a binding in the form of a {@link Scriptable}
      */
     public Builder put(@Nonnull String name, @Nonnull Scriptable scriptable) {
-      bindingsMap.put(Objects.requireNonNull(name), scriptable);
+      bindingsMap.put(Objects.requireNonNull(name), Objects.requireNonNull(scriptable));
       return this;
     }
 
