@@ -107,8 +107,14 @@ public final class JSONataExpression {
 
   private void prepEvaluationContext(Context cx) {
     cx.setOptimizationLevel(-1); // No point in optimizing
-    final SquatchContext squatchContext = (SquatchContext) cx;
-    squatchContext.timeoutNanos = expressionOptions.evaluateTimeoutNanos;
+    /*
+     * cx may not be an instance of SquatchContext if this library is used within some other custom
+     * context
+     */
+    if (cx instanceof SquatchContext) {
+      final SquatchContext squatchContext = (SquatchContext) cx;
+      squatchContext.timeoutNanos = expressionOptions.evaluateTimeoutNanos;
+    }
   }
 
   private Object buildBindings(Context cx, @Nonnull Map<String, Object> bindingsMap) {
