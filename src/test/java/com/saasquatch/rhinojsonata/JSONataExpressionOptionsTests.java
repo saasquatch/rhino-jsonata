@@ -100,10 +100,10 @@ public class JSONataExpressionOptionsTests {
       ScriptableObject.putProperty(sharedScope, "foo", 123);
       final JSONataExpression ex1 = jsonata.parse("$f1()",
           JSONataExpressionOptions.newBuilder().setScope(sharedScope).build());
-      ex1.registerFunction("f1", "() => ++foo", null);
+      ex1.registerFunction("f1", "() => ++foo");
       final JSONataExpression ex2 = jsonata.parse("$f1()",
           JSONataExpressionOptions.newBuilder().setScope(sharedScope).build());
-      ex2.registerFunction("f1", "() => ++foo", null);
+      ex2.registerFunction("f1", "() => ++foo");
       assertEquals(124, ex1.evaluate().intValue());
       assertEquals(125, ex2.evaluate().intValue());
       assertEquals(126, ex1.evaluate().intValue());
