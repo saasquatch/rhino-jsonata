@@ -181,6 +181,14 @@ public final class JSONataExpression {
   }
 
   /**
+   * Same as {@link JSONataExpression#registerFunction(String, String, String)} but without a
+   * signature definition.
+   */
+  public void registerFunction(@Nonnull String name, @Nonnull String jsFunctionExpression) {
+    _registerFunction(name, jsFunctionExpression, null);
+  }
+
+  /**
    * Bind a JavaScript function to a name in the expression.<br>Note that the JS function string has
    * to be a JS expression that strictly evaluates to a function, which is to say that {@code "a =>
    * a"} and {@code "(function(a) {return a;})"} work, but {@code "function(a) {return a;}"} and
@@ -192,6 +200,11 @@ public final class JSONataExpression {
    *                  Official docs</a>
    */
   public void registerFunction(@Nonnull String name, @Nonnull String jsFunctionExpression,
+      @Nonnull String signature) {
+    _registerFunction(name, jsFunctionExpression, Objects.requireNonNull(signature));
+  }
+
+  private void _registerFunction(@Nonnull String name, @Nonnull String jsFunctionExpression,
       @Nullable String signature) {
     Objects.requireNonNull(name);
     Objects.requireNonNull(jsFunctionExpression);
