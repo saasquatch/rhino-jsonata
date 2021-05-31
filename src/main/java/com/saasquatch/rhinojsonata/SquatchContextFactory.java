@@ -11,11 +11,11 @@ final class SquatchContextFactory extends ContextFactory {
 
   @Override
   public Context enterContext() {
-    final Context cx = super.enterContext();
-    if (!(cx instanceof SquatchContext)) {
+    final Context currentContext = Context.getCurrentContext();
+    if (currentContext != null && !(currentContext instanceof SquatchContext)) {
       throw new JSONataException("Unexpected Context type detected. Please exit it first.");
     }
-    return cx;
+    return super.enterContext();
   }
 
   @Override
