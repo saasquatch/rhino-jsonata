@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 
@@ -30,7 +31,7 @@ public class JunkDrawerTests {
   @Test
   public void testRethrowRhinoException() {
     final ObjectMapper objectMapper = new ObjectMapper();
-    final Context cx = SquatchContextFactory.INSTANCE.enterContext();
+    final Context cx = new ContextFactory().enterContext();
     try {
       final Scriptable scope = cx.initSafeStandardObjects();
       try {
