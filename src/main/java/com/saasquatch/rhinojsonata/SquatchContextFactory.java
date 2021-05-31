@@ -13,7 +13,7 @@ final class SquatchContextFactory extends ContextFactory {
   public Context enterContext() {
     final Context cx = super.enterContext();
     if (!(cx instanceof SquatchContext)) {
-      throw new JSONataException("Custom Context detected. Please exit it first.");
+      throw new JSONataException("Unexpected Context type detected. Please exit it first.");
     }
     return cx;
   }
