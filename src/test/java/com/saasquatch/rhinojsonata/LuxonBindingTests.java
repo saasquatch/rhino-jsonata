@@ -15,6 +15,7 @@ import org.mozilla.javascript.ScriptableObject;
 
 public class LuxonBindingTests {
 
+  @SuppressWarnings("SpellCheckingInspection")
   private static final String LUXON_JS_URL = "https://cdn.jsdelivr.net/npm/luxon@1.27.0/build/global/luxon.min.js";
 
   private static JSONata jsonata;
