@@ -9,6 +9,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.Scriptable;
 
 public class JSONataExpressionTests {
 
@@ -210,6 +214,21 @@ public class JSONataExpressionTests {
     assertEquals(0, expression2.evaluate().intValue());
     assertEquals(2, expression.evaluate().intValue());
     assertEquals(1, expression2.evaluate().intValue());
+  }
+
+  @Test
+  public void testRegisterRhinoFunctions() {
+    final Function f1;
+    final Context cx = new ContextFactory().enterContext();
+    try {
+      final Scriptable scope = cx.initSafeStandardObjects();
+      f1 = (Function) cx.evaluateString(scope, "JSON.stringify", null, 1, null);
+    } finally {
+      Context.exit();
+    }
+    final JSONataExpression expression = jsonata.parse("$foo(1)");
+    expression.registerFunction("foo", f1, null);
+    assertEquals("1", expression.evaluate().textValue());
   }
 
 }
