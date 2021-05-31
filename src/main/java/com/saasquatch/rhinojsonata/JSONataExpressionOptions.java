@@ -61,11 +61,15 @@ public final class JSONataExpressionOptions {
      * protect against infinite loops. Note that the timeout and maxDepth are enforced within
      * jsonata-js, not on the JS runtime level.<br>This method has a few caveats:
      * <ul>
-     *   <li>This method relies on <a href="https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158">
-     *   internal and potentially unstable APIs from jsonata-js</a>, so it's possible that it won't
-     *   work with a future version of jsonata-js.</li>
-     *   <li>Due to the nature of the jsonata-js internal method, using this method will make the
-     *   {@link JSONataExpression#evaluate()} methods not thread safe.</li>
+     *   <li>
+     *     This method relies on <a href="https://github.com/jsonata-js/jsonata/blob/97295a6fdf0ed0df7677e5bf36a50bb633eb53a2/test/run-test-suite.js#L158">
+     *     internal and potentially unstable APIs from jsonata-js</a>, so it's possible that it
+     *     won't work with a future version of jsonata-js.
+     *   </li>
+     *   <li>
+     *     Due to the nature of the jsonata-js internal method, using this method will make the
+     *     {@link JSONataExpression#evaluate()} methods not thread safe.
+     *   </li>
      * </ul>
      */
     @Beta
@@ -83,11 +87,21 @@ public final class JSONataExpressionOptions {
     }
 
     /**
-     * Set the Rhino scope for the {@link JSONataExpression}. By default, every {@link
-     * JSONataExpression} gets its own scope with {@link Context#initSafeStandardObjects()}. If
-     * having a shared scope across all {@link JSONataExpression}s is desired, then a separate
-     * global scope can be created and passed in here. This method can also be useful for preloading
-     * JavaScript libraries for the expression to use.
+     * Set the Rhino scope for the {@link JSONataExpression}. This method can be useful in a few use
+     * cases:
+     * <ul>
+     *   <li>
+     *     By default, every {@link JSONataExpression} gets its own scope with
+     *     {@link Context#initSafeStandardObjects()}, which means every instance of
+     *     {@link JSONataExpression} is sandboxed with its own states. If having a shared scope
+     *     across multiple {@link JSONataExpression}s is desired, then a custom scope can be created
+     *     and passed in here.
+     *   </li>
+     *   <li>
+     *     This method can be used to preload JavaScript libraries into the scope for the expression
+     *     to use in {@link JSONataExpression#assign(String, String)}.
+     *   </li>
+     * </ul>
      */
     @Beta
     public Builder setScope(@Nonnull Scriptable scope) {
