@@ -130,10 +130,7 @@ final class JunkDrawer {
    * Convert a {@link JsonNode} into an object that's recognizable by Rhino.
    */
   public static Object jsonNodeToJs(@Nonnull Context cx, @Nonnull Scriptable scope,
-      @Nonnull ObjectMapper objectMapper, @Nullable JsonNode jsonNode) {
-    if (jsonNode == null) {
-      return null;
-    }
+      @Nonnull ObjectMapper objectMapper, @Nonnull JsonNode jsonNode) {
     switch (jsonNode.getNodeType()) {
       case NULL:
         return null;
