@@ -9,7 +9,6 @@ import java.net.URL;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -28,7 +27,7 @@ public class LuxonBindingTests {
   @Test
   public void test() throws Exception {
     final Scriptable jsonataFriendlyLuxonDuration;
-    final Context cx = new ContextFactory().enterContext();
+    final Context cx = Context.enter();
     try (Reader luxonReader = new InputStreamReader(new URL(LUXON_JS_URL).openStream(), UTF_8)) {
       final Scriptable scope = cx.initSafeStandardObjects();
       cx.evaluateReader(scope, luxonReader, null, 1, null);

@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 
@@ -219,7 +218,7 @@ public class JSONataExpressionTests {
   @Test
   public void testRegisterRhinoFunctions() {
     final Function f1;
-    final Context cx = new ContextFactory().enterContext();
+    final Context cx = Context.enter();
     try {
       final Scriptable scope = cx.initSafeStandardObjects();
       f1 = (Function) cx.evaluateString(scope, "JSON.stringify", null, 1, null);
