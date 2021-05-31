@@ -7,8 +7,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextFactory;
 
 public class JSONataTests {
 
@@ -40,21 +38,6 @@ public class JSONataTests {
       fail();
     } catch (JSONataException e) {
       assertTrue(e.getMessage().contains("\"java\" is not defined"));
-    }
-  }
-
-  @Test
-  public void testRejectingUnexpectedContextType() {
-    @SuppressWarnings("unused") final Context cx = new ContextFactory().enterContext();
-    try {
-      try {
-        jsonata.parse("$foo");
-        fail();
-      } catch (JSONataException e) {
-        assertTrue(e.getMessage().contains("Context type"));
-      }
-    } finally {
-      Context.exit();
     }
   }
 
