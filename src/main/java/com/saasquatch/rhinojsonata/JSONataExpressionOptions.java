@@ -2,10 +2,7 @@ package com.saasquatch.rhinojsonata;
 
 import com.saasquatch.rhinojsonata.annotations.Beta;
 import java.time.Duration;
-import java.util.Objects;
 import javax.annotation.Nonnull;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Scriptable;
 
 /**
  * Options for {@link JSONataExpression}
@@ -19,14 +16,12 @@ public final class JSONataExpressionOptions {
   final long evaluateTimeoutNanos;
   final int timeboxExpressionTimeboxMillis;
   final int timeboxExpressionMaxDepth;
-  final Scriptable scope;
 
   private JSONataExpressionOptions(long evaluateTimeoutNanos, int timeboxExpressionTimeboxMillis,
-      int timeboxExpressionMaxDepth, Scriptable scope) {
+      int timeboxExpressionMaxDepth) {
     this.evaluateTimeoutNanos = evaluateTimeoutNanos;
     this.timeboxExpressionTimeboxMillis = timeboxExpressionTimeboxMillis;
     this.timeboxExpressionMaxDepth = timeboxExpressionMaxDepth;
-    this.scope = scope;
   }
 
   public static Builder newBuilder() {
@@ -38,7 +33,6 @@ public final class JSONataExpressionOptions {
     private long evaluateTimeoutNanos;
     private int timeboxExpressionTimeboxMillis;
     private int timeboxExpressionMaxDepth;
-    private Scriptable scope;
 
     private Builder() {}
 
@@ -86,32 +80,9 @@ public final class JSONataExpressionOptions {
       return this;
     }
 
-    /**
-     * Set the Rhino scope for the {@link JSONataExpression}. This method can be useful in a few use
-     * cases:
-     * <ul>
-     *   <li>
-     *     By default, every {@link JSONataExpression} gets its own scope with
-     *     {@link Context#initSafeStandardObjects()}, which means every instance of
-     *     {@link JSONataExpression} is sandboxed with its own states. If having a shared scope
-     *     across multiple {@link JSONataExpression}s is desired, then a custom scope can be created
-     *     and passed in here.
-     *   </li>
-     *   <li>
-     *     This method can be used to preload JavaScript libraries into the scope for the expression
-     *     to use in {@link JSONataExpression#assign(String, String)}.
-     *   </li>
-     * </ul>
-     */
-    @Beta
-    public Builder setScope(@Nonnull Scriptable scope) {
-      this.scope = Objects.requireNonNull(scope);
-      return this;
-    }
-
     public JSONataExpressionOptions build() {
       return new JSONataExpressionOptions(evaluateTimeoutNanos, timeboxExpressionTimeboxMillis,
-          timeboxExpressionMaxDepth, scope);
+          timeboxExpressionMaxDepth);
     }
 
   }

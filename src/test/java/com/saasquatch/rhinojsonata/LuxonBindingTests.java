@@ -27,32 +27,6 @@ public class LuxonBindingTests {
 
   @Test
   public void test() throws Exception {
-    final Scriptable scope;
-    final Context cx = new ContextFactory().enterContext();
-    try (Reader luxonReader = new InputStreamReader(new URL(LUXON_JS_URL).openStream(), UTF_8)) {
-      scope = cx.initSafeStandardObjects();
-      cx.evaluateReader(scope, luxonReader, null, 1, null);
-      cx.evaluateString(scope, ""
-          + "function getProperties(clazz) {\n"
-          + "  return Object.getOwnPropertyNames(clazz)\n"
-          + "    .filter((p) => ![\"prototype\", \"name\", \"length\"].includes(p))\n"
-          + "    .reduce((props, p) => {\n"
-          + "      props[p] = clazz[p];\n"
-          + "      return props;\n"
-          + "    }, {});\n"
-          + "}", null, 1, null);
-    } finally {
-      Context.exit();
-    }
-    final JSONataExpression expression = jsonata.parse(
-        "$Duration.fromISO(\"P2M\").plus({\"months\":3, \"days\":10}).toISO()",
-        JSONataExpressionOptions.newBuilder().setScope(scope).build());
-    expression.assign("Duration", "getProperties(luxon.Duration)");
-    assertEquals("P5M10D", expression.evaluate().textValue());
-  }
-
-  @Test
-  public void test2() throws Exception {
     final Scriptable jsonataFriendlyLuxonDuration;
     final Context cx = new ContextFactory().enterContext();
     try (Reader luxonReader = new InputStreamReader(new URL(LUXON_JS_URL).openStream(), UTF_8)) {

@@ -66,22 +66,17 @@ public final class JSONata {
             new Object[]{expressionNativeObject, expressionOptions.timeboxExpressionTimeboxMillis,
                 expressionOptions.timeboxExpressionMaxDepth});
       }
-      return new JSONataExpression(this, expressionNativeObject,
-          createExpressionScope(contextFactory, expressionOptions), expressionOptions);
+      /*
+       * Every JSONataExpression gets its own scope so the original and likely shared JSONata
+       * instance doesn't get contaminated
+       */
+      return new JSONataExpression(this, expressionNativeObject, createScope(contextFactory),
+          expressionOptions);
     } catch (RhinoException e) {
       return rethrowRhinoException(cx, scope, objectMapper, e);
     } finally {
       Context.exit();
     }
-  }
-
-  /**
-   * Every JSONataExpression by default gets its own scope so the original and likely shared JSONata
-   * instance doesn't get contaminated
-   */
-  private Scriptable createExpressionScope(@Nonnull ContextFactory contextFactory,
-      @Nonnull JSONataExpressionOptions expressionOptions) {
-    return expressionOptions.scope == null ? createScope(contextFactory) : expressionOptions.scope;
   }
 
   Function getTimeboxExpressionFunction() {
