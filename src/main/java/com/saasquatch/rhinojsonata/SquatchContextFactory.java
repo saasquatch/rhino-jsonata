@@ -10,6 +10,15 @@ final class SquatchContextFactory extends ContextFactory {
   public static final SquatchContextFactory INSTANCE = new SquatchContextFactory();
 
   @Override
+  public Context enterContext() {
+    final Context cx = super.enterContext();
+    if (!(cx instanceof SquatchContext)) {
+      throw new JSONataException("Custom Context detected. Please exit it first.");
+    }
+    return cx;
+  }
+
+  @Override
   protected Context makeContext() {
     final SquatchContext squatchContext = new SquatchContext(this);
     // Set it to 10000 because the example provided by Rhino is 10000
