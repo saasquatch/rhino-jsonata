@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import org.mozilla.javascript.Scriptable;
 
 /**
  * Bindings for {@link JSONataExpression#evaluate(JsonNode, EvaluateBindings)}
@@ -51,8 +52,15 @@ public final class EvaluateBindings {
      *                  {@code undefined}.
      */
     public Builder put(@Nonnull String name, @Nonnull JsonNode jsonValue) {
-      // deepCopy to ensure immutability
-      bindingsMap.put(Objects.requireNonNull(name), jsonValue.deepCopy());
+      bindingsMap.put(Objects.requireNonNull(name), jsonValue);
+      return this;
+    }
+
+    /**
+     * Put a binding in the form of a {@link Scriptable}
+     */
+    public Builder put(@Nonnull String name, @Nonnull Scriptable scriptable) {
+      bindingsMap.put(Objects.requireNonNull(name), scriptable);
       return this;
     }
 

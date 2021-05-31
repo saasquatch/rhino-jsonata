@@ -126,6 +126,8 @@ public final class JSONataExpression {
         bindingJsObject = cx.evaluateString(scope, (String) bindingValue, null, 1, null);
       } else if (bindingValue instanceof JsonNode) {
         bindingJsObject = jsonNodeToJs(cx, scope, objectMapper, (JsonNode) bindingValue);
+      } else if (bindingValue instanceof Scriptable) {
+        bindingJsObject = bindingValue;
       } else {
         throw new AssertionError();
       }
@@ -169,6 +171,22 @@ public final class JSONataExpression {
     final Context cx = contextFactory.enterContext();
     try {
       _assign(cx, name, jsonNodeToJs(cx, scope, objectMapper, jsonValue));
+    } catch (RhinoException e) {
+      rethrowRhinoException(cx, scope, objectMapper, e);
+    } finally {
+      Context.exit();
+    }
+  }
+
+  /**
+   * Bind a value in the form of a {@link Scriptable} to a name in the expression.
+   */
+  public void assign(@Nonnull String name, @Nonnull Scriptable scriptable) {
+    Objects.requireNonNull(name);
+    Objects.requireNonNull(scriptable);
+    final Context cx = contextFactory.enterContext();
+    try {
+      _assign(cx, name, scriptable);
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, objectMapper, e);
     } finally {
