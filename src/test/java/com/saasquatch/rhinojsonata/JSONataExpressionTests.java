@@ -179,12 +179,12 @@ public class JSONataExpressionTests {
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
-      expression.registerFunction("foo", "a => a + a");
+      expression.registerFunction("foo", "a => a + a", null);
       assertEquals(JsonNodeFactory.instance.numberNode(2), expression.evaluate());
     }
     {
       final JSONataExpression expression = jsonata.parse("$foo(1)");
-      expression.registerFunction("foo", "(function(a) {return a + a;})");
+      expression.registerFunction("foo", "(function(a) {return a + a;})", null);
       assertEquals(JsonNodeFactory.instance.numberNode(2), expression.evaluate());
     }
     {
@@ -202,11 +202,11 @@ public class JSONataExpressionTests {
   @Test
   public void testRegisterStatefulFunctions() {
     final JSONataExpression expression = jsonata.parse("$foo()");
-    expression.registerFunction("foo", "var _counter = 0; () => _counter++");
+    expression.registerFunction("foo", "var _counter = 0; () => _counter++", null);
     assertEquals(0, expression.evaluate().intValue());
     assertEquals(1, expression.evaluate().intValue());
     final JSONataExpression expression2 = jsonata.parse("$foo()");
-    expression2.registerFunction("foo", "var _counter = 0; () => _counter++;");
+    expression2.registerFunction("foo", "var _counter = 0; () => _counter++;", null);
     assertEquals(0, expression2.evaluate().intValue());
     assertEquals(2, expression.evaluate().intValue());
     assertEquals(1, expression2.evaluate().intValue());

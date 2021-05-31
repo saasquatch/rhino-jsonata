@@ -18,6 +18,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
+import org.mozilla.javascript.Function;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -199,14 +200,6 @@ public final class JSONataExpression {
   }
 
   /**
-   * Same as {@link JSONataExpression#registerFunction(String, String, String)} but without a
-   * signature definition.
-   */
-  public void registerFunction(@Nonnull String name, @Nonnull String jsFunctionExpression) {
-    _registerFunction(name, jsFunctionExpression, null);
-  }
-
-  /**
    * Bind a JavaScript function to a name in the expression.<br>Note that the JS function string has
    * to be a JS expression that strictly evaluates to a function, which is to say that {@code "a =>
    * a"} and {@code "(function(a) {return a;})"} work, but {@code "function(a) {return a;}"} and
@@ -218,24 +211,43 @@ public final class JSONataExpression {
    *                  Official docs</a>
    */
   public void registerFunction(@Nonnull String name, @Nonnull String jsFunctionExpression,
-      @Nonnull String signature) {
-    _registerFunction(name, jsFunctionExpression, Objects.requireNonNull(signature));
-  }
-
-  private void _registerFunction(@Nonnull String name, @Nonnull String jsFunctionExpression,
       @Nullable String signature) {
     Objects.requireNonNull(name);
     Objects.requireNonNull(jsFunctionExpression);
     final Context cx = contextFactory.enterContext();
     try {
-      ScriptableObject.callMethod(cx, expressionNativeObject, REGISTER_FUNCTION,
-          new Object[]{name, cx.evaluateString(scope, jsFunctionExpression, null, 1, null),
-              signature == null ? Undefined.instance : signature});
+      _registerFunction(cx, name, cx.evaluateString(scope, jsFunctionExpression, null, 1, null),
+          signature);
     } catch (RhinoException e) {
       rethrowRhinoException(cx, scope, objectMapper, e);
     } finally {
       Context.exit();
     }
+  }
+
+  /**
+   * Bind a JavaScript function to a name in the expression.
+   */
+  public void registerFunction(@Nonnull String name, @Nonnull Function jsFunction,
+      @Nullable String signature) {
+    Objects.requireNonNull(name);
+    Objects.requireNonNull(jsFunction);
+    final Context cx = contextFactory.enterContext();
+    try {
+      _registerFunction(cx, name, jsFunction, signature);
+    } catch (RhinoException e) {
+      rethrowRhinoException(cx, scope, objectMapper, e);
+    } finally {
+      Context.exit();
+    }
+  }
+
+  private void _registerFunction(Context cx, @Nonnull String name, @Nonnull Object jsFunctionObject,
+      @Nullable String signature) {
+    Objects.requireNonNull(name);
+    Objects.requireNonNull(jsFunctionObject);
+    ScriptableObject.callMethod(cx, expressionNativeObject, REGISTER_FUNCTION,
+        new Object[]{name, jsFunctionObject, signature == null ? Undefined.instance : signature});
   }
 
 }
