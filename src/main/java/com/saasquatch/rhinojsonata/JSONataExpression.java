@@ -76,9 +76,10 @@ public final class JSONataExpression {
     Objects.requireNonNull(bindings);
     final Context cx = contextFactory.enterContext();
     try {
-      prepEvaluationContext(cx);
+      cx.setOptimizationLevel(-1);
       final Object inputJsObject = jsonNodeToJs(cx, scope, objectMapper, input);
       final Object bindingsJsObject = buildBindings(cx, bindings.bindingsMap);
+      prepEvaluationContext(cx);
       final Object evaluateResult;
       try {
         evaluateResult = ScriptableObject.callMethod(cx, expressionNativeObject, EVALUATE,
@@ -96,6 +97,8 @@ public final class JSONataExpression {
          */
         throw new JSONataException("Stack overflow error: Check for non-terminating recursive "
             + "function. Consider rewriting as tail-recursive.", e);
+      } finally {
+        restoreEvaluationContext(cx);
       }
       return jsToJsonNode(cx, scope, objectMapper, evaluateResult);
     } catch (RhinoException e) {
@@ -114,6 +117,13 @@ public final class JSONataExpression {
     if (cx instanceof SquatchContext) {
       final SquatchContext squatchContext = (SquatchContext) cx;
       squatchContext.timeoutNanos = expressionOptions.evaluateTimeoutNanos;
+    }
+  }
+
+  private void restoreEvaluationContext(Context cx) {
+    if (cx instanceof SquatchContext) {
+      final SquatchContext squatchContext = (SquatchContext) cx;
+      squatchContext.timeoutNanos = 0;
     }
   }
 
