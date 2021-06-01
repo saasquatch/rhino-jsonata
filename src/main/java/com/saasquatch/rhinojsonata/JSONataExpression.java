@@ -79,7 +79,7 @@ public final class JSONataExpression {
       cx.setOptimizationLevel(-1);
       final Object inputJsObject = jsonNodeToJs(cx, scope, objectMapper, input);
       final Object bindingsJsObject = buildBindings(cx, bindings.bindingsMap);
-      prepEvaluationContext(cx);
+      prepEvaluateContext(cx);
       final Object evaluateResult;
       try {
         evaluateResult = ScriptableObject.callMethod(cx, expressionNativeObject, EVALUATE,
@@ -98,7 +98,7 @@ public final class JSONataExpression {
         throw new JSONataException("Stack overflow error: Check for non-terminating recursive "
             + "function. Consider rewriting as tail-recursive.", e);
       } finally {
-        restoreEvaluationContext(cx);
+        restoreEvaluateContext(cx);
       }
       return jsToJsonNode(cx, scope, objectMapper, evaluateResult);
     } catch (RhinoException e) {
@@ -108,7 +108,7 @@ public final class JSONataExpression {
     }
   }
 
-  private void prepEvaluationContext(Context cx) {
+  private void prepEvaluateContext(Context cx) {
     cx.setOptimizationLevel(-1); // No point in optimizing
     /*
      * cx may not be an instance of SquatchContext if this library is used within some other custom
@@ -120,7 +120,7 @@ public final class JSONataExpression {
     }
   }
 
-  private void restoreEvaluationContext(Context cx) {
+  private void restoreEvaluateContext(Context cx) {
     if (cx instanceof SquatchContext) {
       final SquatchContext squatchContext = (SquatchContext) cx;
       squatchContext.timeoutNanos = 0;
