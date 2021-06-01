@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
 
 public class LuxonBindingTests {
 
@@ -41,8 +40,7 @@ public class LuxonBindingTests {
           + "      return props;\n"
           + "    }, {});\n"
           + "}", null, 1, null);
-      final Scriptable luxon = (Scriptable) ScriptableObject.getProperty(scope, "luxon");
-      final Scriptable luxonDuration = (Scriptable) ScriptableObject.getProperty(luxon, "Duration");
+      final Object luxonDuration = cx.evaluateString(scope, "luxon.Duration", null, 1, null);
       jsonataFriendlyLuxonDuration = (Scriptable) getPropertiesFunction.call(
           cx, scope, scope, new Object[]{luxonDuration});
     } finally {
