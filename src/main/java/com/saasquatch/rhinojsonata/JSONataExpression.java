@@ -141,7 +141,7 @@ public final class JSONataExpression {
       } else if (bindingValue instanceof Scriptable) {
         bindingJsObject = bindingValue;
       } else {
-        throw new AssertionError();
+        throw new AssertionError(bindingValue.toString());
       }
       ScriptableObject.putProperty(nativeObject, name, bindingJsObject);
     });
