@@ -3,6 +3,8 @@ package com.saasquatch.rhinojsonata;
 import com.saasquatch.rhinojsonata.annotations.Beta;
 import java.time.Duration;
 import javax.annotation.Nonnull;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 
 /**
  * Options for {@link JSONataExpression}
@@ -38,7 +40,11 @@ public final class JSONataExpressionOptions {
 
     /**
      * Set a timeout for {@link JSONataExpression#evaluate()} methods to protect against infinite
-     * loops. Note that this timeout is enforced on the JS runtime level, not within jsonata-js.
+     * loops. Note that this timeout is enforced on the JS runtime level, not within jsonata-js. The
+     * main limitation of this method is that it relies on custom implementations of {@link Context}
+     * and {@link ContextFactory}, which means that if the {@link JSONataExpression#evaluate()}
+     * methods are used within another {@link Context}, the timeout specified in this method will
+     * have no effect.
      */
     @Beta
     public Builder setEvaluateTimeout(@Nonnull Duration evaluateTimeout) {
