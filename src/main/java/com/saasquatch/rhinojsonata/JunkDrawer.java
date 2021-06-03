@@ -158,7 +158,7 @@ final class JunkDrawer {
       @Nonnull ObjectMapper objectMapper, @Nullable Object jsObject) {
     if (jsObject == null) {
       return JsonNodeFactory.instance.nullNode();
-    } else if (jsObject instanceof Undefined) {
+    } else if (Undefined.isUndefined(jsObject)) {
       return JsonNodeFactory.instance.missingNode();
     } else if (jsObject instanceof CharSequence) {
       return JsonNodeFactory.instance.textNode(jsObject.toString());
