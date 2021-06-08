@@ -1,21 +1,14 @@
 package com.saasquatch.rhinojsonata;
 
+import static com.saasquatch.rhinojsonata.TestJSONataHolder.jsonata;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class JSONataTests {
-
-  private static JSONata jsonata;
-
-  @BeforeAll
-  public static void beforeAll() {
-    jsonata = JSONata.create();
-  }
 
   @Test
   public void testJSONataTimeboxExpressionFunctionLazyInit() {

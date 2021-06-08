@@ -1,5 +1,6 @@
 package com.saasquatch.rhinojsonata;
 
+import static com.saasquatch.rhinojsonata.TestJSONataHolder.jsonata;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -7,20 +8,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.Scriptable;
 
 public class JSONataExpressionTests {
-
-  private static JSONata jsonata;
-
-  @BeforeAll
-  public static void beforeAll() {
-    jsonata = JSONata.create();
-  }
 
   @Test
   public void testParse() {
