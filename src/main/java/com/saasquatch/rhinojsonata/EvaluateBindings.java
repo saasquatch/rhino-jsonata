@@ -52,7 +52,7 @@ public final class EvaluateBindings {
      *                  {@code undefined}.
      */
     public Builder put(@Nonnull String name, @Nonnull JsonNode jsonValue) {
-      bindingsMap.put(Objects.requireNonNull(name), jsonValue);
+      bindingsMap.put(Objects.requireNonNull(name), Objects.requireNonNull(jsonValue));
       return this;
     }
 
