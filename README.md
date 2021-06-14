@@ -32,7 +32,7 @@ For documentation on JSONata itself, please refer to the official [JSONata docs]
 ## Current limitations
 
 - The async version of `evaluate` [with a callback](https://docs.jsonata.org/embedding-extending#expressionevaluateinput-bindings-callback) is not supported.
-- Only JavaScript functions as strings can be registered with `assign` or `registerFunction`. Java functions are not supported.
+- Only JavaScript functions can be registered with `assign` or `registerFunction`. Java functions are not supported.
 - A lot of ES6 features, including but not limited to generator functions, async/await, and template literals, are not supported.
 - When registering a function, the JS expression must strictly evaluate to a function, which is to say expressions like `(function(a) {return a;})` and `a => a` work, but `function(a) {return a;}` and `function foo(a) {return a;}` do not work.
 - Registering stateful functions can make the `evaluate` methods not thread safe.
