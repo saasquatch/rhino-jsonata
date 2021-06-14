@@ -22,7 +22,7 @@ public final class EvaluateBindings {
 
   final Map<String, Object> bindingsMap;
 
-  private EvaluateBindings(Map<String, Object> bindingsMap) {
+  private EvaluateBindings(@Nonnull Map<String, Object> bindingsMap) {
     this.bindingsMap = bindingsMap;
   }
 
